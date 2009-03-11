@@ -1,6 +1,6 @@
 package Slim::Player::SqueezeSlave;
 
-# $Id: Squeezebox2.pm 12808 2007-08-31 04:08:54Z andy $
+# $Id: SqueezeSlave.pm 12808 2007-08-31 04:08:54Z andy $
 
 # SqueezeCenter Copyright 2001-2007 Logitech.
 # This program is free software; you can redistribute it and/or
@@ -30,17 +30,18 @@ use Slim::Utils::Log;
 use Slim::Utils::Misc;
 use Slim::Utils::Unicode;
 use Slim::Utils::Prefs;
+use Slim::Display::Text16; # For text display support
 
 my $prefs = preferences('server');
 
 our $defaultPrefs = {
 	'replayGainMode'     => 0,
 	'minSyncAdjust'      => 30,	# ms
+	'maxBitrate'         => 0,
 };
 
 # Keep track of direct stream redirects
 our $redirects = {};
-
 
 sub new {
 	my $class = shift;
@@ -74,7 +75,7 @@ sub model {
 
 sub modelName { 'Squeezeslave' }
 
-sub hasIR { return 0; }
+sub hasIR { return 1; }
 
 # in order of preference based on whether we're connected via wired or wireless...
 sub formats {
@@ -128,6 +129,17 @@ sub dBToFixed {
 	else {
 		return int(($floatmult * (1 << 16)) + 0.5);
 	}
+}
+
+sub canDoReplayGain {
+	my $client = shift;
+	my $replay_gain = shift;
+
+	if (defined($replay_gain)) {
+		return $client->dBToFixed($replay_gain);
+	}
+
+	return 0;
 }
 
 sub volume {
@@ -303,5 +315,28 @@ sub playPoint {
 	return Slim::Player::Client::playPoint(@_);
 }
 
+
+# We need to implement this to allow us to receive SETD commands
+# and we need SETD to support custom display widths
+sub directBodyFrame { 
+  return 1;
+}
+
+# Allow the player to define it's display width
+sub playerSettingsFrame {
+	my $client   = shift;
+	my $data_ref = shift;
+	
+        my $value;
+        my $id = unpack('C', $$data_ref);
+        
+	# New SETD command 0xfe for display width
+        if ($id == 0xfe) { 
+        	$value = (unpack('CC', $$data_ref))[1];
+                if ($value > 10 && $value < 200) {
+		   $client->display->widthOverride(1, $value);
+                } 
+	}
+}
 
 1;
