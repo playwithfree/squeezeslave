@@ -30,7 +30,7 @@ use Slim::Utils::Log;
 use Slim::Utils::Misc;
 use Slim::Utils::Unicode;
 use Slim::Utils::Prefs;
-use Slim::Display::Text16; # For text display support
+use Slim::Display::Text; # For text display support
 
 my $prefs = preferences('server');
 
