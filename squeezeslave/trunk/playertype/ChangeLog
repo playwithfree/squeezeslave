@@ -1,0 +1,50 @@
+2009-03-13 11:41  paddockd
+
+	* Slim/Display/Text.pm, Slim/Networking/Slimproto.pm,
+	  Slim/Player/SqueezeSlave.pm, makepatch,
+	  squeezecenter_squeezeslave_player2-7.3.patch: Added patch
+	  creation script for BUG-11330 and created patch file.
+
+2009-03-13 11:24  paddockd
+
+	* Slim/Display/Lib/TextVFD.pm, Slim/Display/Text.pm: Merged
+	  variable display width changes from Text16 and Text16VFD into
+	  Text and TextVFD modules.
+
+2009-03-13 11:22  paddockd
+
+	* Slim/Display/Lib/TextVFD.pm, Slim/Display/Text.pm: Added Text.pm
+	  and TextVFD.pm from SqueezeCenter sources
+
+2009-03-11 11:46  paddockd
+
+	* Slim/Display/Lib/Text16VFD.pm, Slim/Display/Text16.pm,
+	  Slim/Networking/Slimproto.pm, Slim/Player/SqueezeSlave.pm:
+	  Applied Graham Chapman 18 November 2008 display/lcdd/lircd
+	  patches to the current sources for opening a bug to have the
+	  changes applied to the SqueezeCenter sources.
+	  Set maxBitrate preference to 0, instead of undefined to fix the
+	  issue of band width limiting being enabled by default for
+	  squeezeslave. This is a problem for users how do not have lame
+	  installed as the band width limiting option is not available to
+	  change in the WebUI player settings until lame is installed and
+	  SC has been restarted.
+	  Added canDoReplayGain gain function to SqueezeSlave.pm player.
+	  Updated hasIR function to reflect Squeezeslave new IR feature.
+
+2009-03-11 11:30  paddockd
+
+	* Slim/Display, Slim/Display/Lib, Slim/Display/Lib/Text16VFD.pm,
+	  Slim/Display/Text16.pm, Slim/Networking,
+	  Slim/Networking/Slimproto.pm, Slim/Player/SqueezeSlave.pm: Added
+	  7.4 r25453 files.
+
+2009-03-11 11:24  paddockd
+
+	* Slim/Player/SqueezeSlave.pm: Removed older initial versions.
+
+2009-02-24 13:23  paddockd
+
+	* ., Slim, Slim/Player, Slim/Player/SqueezeSlave.pm: Initial
+	  SqueezeSlave.pm import r25135
+

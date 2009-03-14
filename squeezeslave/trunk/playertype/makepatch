@@ -1,6 +1,7 @@
 #!/bin/bash
-PATCHFILE=squeezecenter_squeezeslave_player2-7.3.patch
+PATCHFILE=squeezecenter_squeezeslave_player3-7.3.patch
 svn diff -r31 Slim/Player/SqueezeSlave.pm > ${PATCHFILE}
 svn diff -r31 Slim/Networking/Slimproto.pm >> ${PATCHFILE}
 svn diff -r34 Slim/Display/Text.pm >> ${PATCHFILE}
 svn diff -r34 Slim/Display/Lib/TextVFD.pm >> ${PATCHFILE}
+cp -ip ${PATCHFILE} ../squeezeslave/patches
