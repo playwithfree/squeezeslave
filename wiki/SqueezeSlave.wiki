@@ -2,13 +2,9 @@
 
 = Introduction =
 
-Add your content here.
+SqueezeSlave is a software implementation of the Squeezebox from Slim Devices which is now owned by Logitech.
 
 
 = Details =
 
-
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+Please visit http://wiki.slimdevices.com/index.php/SqueezeSlave for features and usage information.
