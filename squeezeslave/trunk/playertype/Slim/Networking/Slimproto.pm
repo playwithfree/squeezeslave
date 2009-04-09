@@ -1,6 +1,6 @@
 package Slim::Networking::Slimproto;
 
-# $Id: Slimproto.pm 25405 2009-03-08 11:36:41Z ayoung $
+# $Id: Slimproto.pm 25682 2009-03-24 15:10:27Z andy $
 
 # SqueezeCenter Copyright 2001-2007 Logitech.
 # This program is free software; you can redistribute it and/or
@@ -55,6 +55,9 @@ my $check_time;                 # time scheduled for next check_all_clients
 if ( main::SLIM_SERVICE ) {
 	# don't check as often on SN
 	$check_all_clients_time = 30;
+	
+	# And forget immediately upon disconnect
+	$forget_disconnected_time = 5;
 }
 
 my $slimproto_socket;
@@ -1078,7 +1081,7 @@ sub _hello_handler {
 	} elsif ($deviceids[$deviceid] eq 'squeezeslave') {
 
 		$client_class = 'Slim::Player::SqueezeSlave';
-		$display_class = 'Slim::Display::Text';
+		$display_class = 'Slim::Display::NoDisplay';
 
 	} elsif ($deviceids[$deviceid] eq 'squeezeplay' || $deviceids[$deviceid] eq 'controller') {
 
