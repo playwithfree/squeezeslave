@@ -1,6 +1,6 @@
 package Slim::Networking::Slimproto;
 
-# $Id: Slimproto.pm 25682 2009-03-24 15:10:27Z andy $
+# $Id: Slimproto.pm 25809 2009-04-03 20:27:13Z adrian $
 
 # SqueezeCenter Copyright 2001-2007 Logitech.
 # This program is free software; you can redistribute it and/or
@@ -1081,7 +1081,7 @@ sub _hello_handler {
 	} elsif ($deviceids[$deviceid] eq 'squeezeslave') {
 
 		$client_class = 'Slim::Player::SqueezeSlave';
-		$display_class = 'Slim::Display::NoDisplay';
+		$display_class = 'Slim::Display::Text';
 
 	} elsif ($deviceids[$deviceid] eq 'squeezeplay' || $deviceids[$deviceid] eq 'controller') {
 
