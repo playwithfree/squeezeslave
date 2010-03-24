@@ -1,0 +1,290 @@
+I have been adding debuging information through squeezeslave to watch
+the buffers and they seem okay the http-> decoder-> output.  I have
+tried increasing them to no avail.
+
+The place it blocks is writing to the decoder buffer (just read off
+http and trying to write to decoders buffer.
+
+I have let portaudio ask for the number of frames to transfer on its
+call back and it seems to default to 1024 (it was hard coded as 256
+before), I have tried placing this back again to no avail, there is
+more buffer interaction, but the waits are still in the same place.
+
+More investigations into this shows that read_buffer is not returning
+eof when there's no data available in the http buffer, it blocks waiting
+for http to get more but the trigger STMd is not being sent to get more
+data as it relies on the decoder finishing.
+
+---
+
+Need to look at supporting skip in calculations as well.
+
+---
+http://forums.slimdevices.com/member.php?u=10044
+
+I've just started to use SS (and find it great to use as a virtual Squeezebox on a PC, espec combined with Moose as a front-end) - however I spotted a few of these errors on the cmd window:
+
+libmad: (mp3) decoding error (0x0101)
+libmad: (mp3) decoding error (0x0101)
+libmad: (mp3) decoding error (0x0238)
+
+I'm running SS 0.8-25 on Vista/32. I'm afraid I've no idea though which tracks the errors correlate to since the SS window is minimised and I don't recall any major issues - possibly some minor sound glitches.
+
+Any ideas what specifically I should be looking out for WRT mp3 files?
+
+The 0x0101 (lost synchronization) error is returned by libmad when it fails to find the requisite sync word at the expected location in the bitstream. It usually indicates either (1) a corrupt bitstream, or (2) stream buffer mismanagement in your code. Since the error is fully recoverable, in the case of (1) the solution is simply to continue decoding.
+
+In the case of (2), the most common problem is a failure to copy the unconsumed portion of the bitstream to the beginning of the new buffer after receiving MAD_ERROR_BUFLEN. However, madplay does this correctly, so if you are actually running madplay under ARM unmodified, this should not be a problem.
+
+If the error occurs with any MP3 file, especially at the same frame index (at the same bitrate), then buffer management is definitely a likely culprit.
+
+The 0x0238 error is a Huffman data overrun error. It happens when the actual big_values section of the bitstream occupies more space than was declared by the bitstream for it. This can happen because the Huffman code words are variable length and the actual length is learned implicitly during decoding.
+
+Most often this is an indication of an error made by an encoder, but it's also possible to happen if there is an error in MAD's Huffman code tables or the process of reading them. As the Huffman table union initialization macros are subject to portability issues, this is a possible source of the problem if you get a lot of these errors.
+
+> In file mad.h you have all the error codes:
+>
+>   MAD_ERROR_LOSTSYNC       = 0x0101,    /* lost synchronization */
+>
+> I'm quite new to MAD too but I've experienced this one
+> already. You get this error when your input function
+> places other than MPEG Audio frames in the MAD input
+> buffer. I experienced this with some files that had
+> some ID tags in the beginning of the file. I had to
+> find the first frame (frame synchronization) and place
+> *that* in the MAD input buffer. In other words, try to
+> skip the something in the beginning of your file and
+> make sure you always give MAD MPEG Audio frames only.
+
+Just to clarify, libmad returns this error whenever it expected to find an 
+MPEG audio sync word (marking the beginning of a frame) but found 
+something else instead. It's mostly an informational error; when you call 
+the decoding routine again it will automatically search for the next sync 
+word in the stream and resynchronize.
+
+There are two cases when libmad expects to find a sync word:
+
+1. After a call to mad_stream_buffer(), a sync word is expected to be 
+found at the beginning of the buffer.
+
+2. After successfully decoding a frame header and calculating the frame's 
+size, another sync word is expected immediately to follow the frame.
+
+When this error is returned, stream->this_frame points to the place in the 
+stream where a sync word was expected.
+
+Usually this error is an indication that something else is in the 
+bitstream, such as an ID3 tag. In this case you might call id3_tag_query() 
+to see if it really is a tag and either read or skip it.
+
+---
+
+Change line 1372 in lib-src/portaudio-v19/src/hostapi/alsa/pa_linux_alsa.c from
+
+SND_PCM_TSTAMP_ENABLE
+
+to
+
+SND_PCM_TSTAMP_MMAP.
+
+ALSA docs say that SND_PCM_TSTAMP_MMAP is:
+"Equivalent with SND_PCM_TSTAMP_ENABLE, just for compatibility with older
+versions"
+
+---
+
+http://lists.apple.com/archives/macnetworkprog/2004/Mar/msg00021.html
+
+Recv will return 0 *only* to indicate that the socket was cleanly closed
+by the other end.
+
+The correct way to find out the peer is disconnected.
+
+OSX
+/usr/include/sys/errno.h:#define   EWOULDBLOCK     EAGAIN          /* Operation would block */
+
+n = recv(mSocket, &buffer, 1, MSG_PEEK);
+if (n == -1)
+if (errno == EWOULDBLOCK)
+no data
+else
+other error handling
+else if (n == 1)
+data is available
+else if (n == 0)
+peer is disconnected
+
+---
+
+http://tangentsoft.net/wskfaq/articles/bsd-compatibility.html
+
+Under BSD Unixes, if the remote peer closes its connection and your program is blocking on recv(), you will get a 0 back from recv(). Winsock behaves the same way, except that it can also return -1, with WSAGetLastError() returning WSAECONNRESET, WSAECONNABORTED or WSAESHUTDOWN, to signal the detectable flavors of abnormal disconnections.
+
+Under Unix, if you\u2019re blocking on send() and your program is ignoring the SIGPIPE signal, it will return with a -1 when the remote peer disconnects, and errno will be EPIPE. Otherwise, your program will be sent the SIGPIPE signal, which will terminate your program if you don\u2019t handle it. Under Winsock, the SIGPIPE/EPIPE functionality does not exist at all: send() will either return 0 for a normal disconnect or -1 for an abnormal disconnect, with WSAGetLastError() returning the same errors as in the recv() discussion above.
+
+---
+
+http://www.cplusplus.com/forum/general/5304/
+
+#define INFINITE (-1)
+
+bool iskeypressed( unsigned timeout_ms = 0 )
+  {
+  struct pollfd pls[ 1 ];
+  pls[ 0 ].fd     = STDIN_FILENO;
+  pls[ 0 ].events = POLLIN | POLLPRI;
+  return poll( pls, 1, timeout_ms ) > 0;
+  }
+
+For the equivalent to poll()ing the keyboard on Windows, use:
+
+bool iskeypressed( unsigned timeout_ms = 0 )
+  {
+  return WaitForSingleObject(
+    GetStdHandle( STD_INPUT_HANDLE ),
+    timeout_ms
+    ) == WAIT_OBJECT_0;
+  }
+
+
+<windows.h> #includes the necessary headers to #define INFINITE as the appropriate value, so this function can be
+used identically to the one above.
+
+---
+
+Try playing with this:
+#include <windows.h>
+#include <stdio.h>
+
+int main()
+{
+printf("->");
+static HANDLE stdinHandle;
+// Get the IO handles
+// getc(stdin);
+stdinHandle = GetStdHandle(STD_INPUT_HANDLE);
+
+while (1)
+{
+DWORD rc = WaitForSingleObject(stdinHandle, 1000);
+
+if( rc == WAIT_TIMEOUT )
+{
+printf("Timeout...");
+}
+else if( rc == WAIT_ABANDONED )
+{
+printf("WAIT_ABANDONED");
+}
+else if( rc == WAIT_OBJECT_0 )
+{
+printf("WAIT_OBJECT_0");
+INPUT_RECORD r[512];
+DWORD read;
+ReadConsoleInput(stdinHandle, r, 512, &read);
+printf("Read: %d", read);
+}
+else if( rc == WAIT_FAILED )
+{
+printf("Error:%d.", GetLastError());
+}
+}
+
+return 0;
+}
+
+---
+
+read() and recv() are interchangable...on sockets... But, on other non-socket FDs,
+read() should be used... Lots of recv() semantics (MSG_OOB, MSG_PEEK, etc.) make
+no sense with non-socket FDs... For socket FDs, read() is essentially the same thing
+as recv() with flags of 0... But, I think you'll find that trying to use recv() on a non-socket
+FD will result in failure with errno ENOTSOCK...
+
+In short, read() works on anything (including sockets), but recv() (and relatives)
+work only on sockets... 
+
+---
+
+File Descriptors And Multithreaded Programs
+Putting the "rev" back in "revocation"
+http://www.ddj.com/architect/212001285
+
+---
+
+Windows Sockets
+An Open Interface for
+Network Programming under
+Microsoft Windows
+http://www.sockets.com/winsock.htm#Deviation_Select
+
+---
+
+Fix 7.4 remote stream hang
+
+7.4 r23955 initial branch  http://svn.slimdevices.com/slim/7.4/trunk/
+7.4 r28672 reported broken http://forums.slimdevices.com/showthread.php?t=69338
+http_recv (2): timesout after 5 minutes and retry loop reconnects successfully.
+
+28008 good
+28009 bad
+
+------------------------------------------------------------------------
+r28009 | adrian | 2009-08-03 09:38:28 -0400 (Mon, 03 Aug 2009) | 3 lines
+ 
+Bug: 10085
+Description: change fix for this bug to check if the callback is for the active streaming socket rather than just a connected socket.  When moving from one track using a pipeline to another it is possible for the new streaming connection to be created before the old one is closed, so make sure we only kill timers if we are the active socket.
+
+------------------------------------------------------------------------
+$ svn -r28008:28009 diff
+Index: Slim/Web/HTTP.pm
+===================================================================
+--- Slim/Web/HTTP.pm    (revision 28008)
++++ Slim/Web/HTTP.pm    (revision 28009)
+@@ -2176,11 +2176,11 @@
+        my $client     = shift;
+        my $httpClient = shift;
+ 
+-       if ( $httpClient->connected() ) {
+-
++       if ( $httpClient == $client->streamingsocket() ) {
++
+                # Bug 10085 - This might be a callback for an old connection  
+                # which we decided to close after establishing the timer, so
+-               # only kill the timer if we were called for an active connection;
++               # only kill the timer if we were called for the active streaming connection;
+                # otherwise we might kill the timer related to the next connection too.
+                Slim::Utils::Timers::killTimers($client, \&tryStreamingLater);
+------------------------------------------------------------------------
+Fix from Adrian for r28009 change.  Not checked in as of March 16, 2010.
+
+Index: Slim/Web/HTTP.pm
+===================================================================
+--- Slim/Web/HTTP.pm	(revision 30377)
++++ Slim/Web/HTTP.pm	(working copy)
+@@ -2199,9 +2199,10 @@
+ 		# only kill the timer if we were called for the active streaming connection;
+ 		# otherwise we might kill the timer related to the next connection too.
+ 		Slim::Utils::Timers::killTimers($client, \&tryStreamingLater);
+-		
+-		Slim::Networking::Select::addWrite($httpClient, \&sendStreamingResponse, 1);
+ 	}
++
++	# Always call sendStreamingResponse so we ensure the socket gets closed
++	Slim::Networking::Select::addWrite($httpClient, \&sendStreamingResponse, 1);
+ }
+ 
+ sub forgetClient {
+---
+
+Investigate no audio after resume from sleep on windows 7 asio
+
+---
+
+Fix linux makefiles current requirement for ogg header files be installed in /usr/include
+
+---
+
+Confirm STMf is still enabled
+
+---
