@@ -601,7 +601,7 @@ int main(int argc, char *argv[]) {
 		      if (FD_ISSET(0, &read_fds)) {
                          while ((key = getch()) != ERR) {
                             ir = getircode(key);
-	                    if (ir == 0x01) {
+	                    if (ir == (unsigned long) 0x01) {
   		               signal_exit_flag = 1;
                             }else{
 			       if (ir != 0) slimproto_ir(&slimproto, 1, 1, ir);

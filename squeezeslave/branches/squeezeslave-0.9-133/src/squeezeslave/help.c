@@ -284,7 +284,7 @@ inet_pton6 (const char *src, unsigned char *dst)
 #endif
 
 void print_version(void) {
-	fprintf(stdout, "squeezeslave %s-%d\n", version, revision);
+	fprintf(stdout, "squeezeslave %s-%d.1\n", version, revision);
 	fprintf(stdout, "compile flags: ");
 #if defined(__APPLE__) && defined(__MACH__)
 	fprintf(stdout, "osx ");
@@ -392,6 +392,7 @@ void print_help(void) {
 "                                  End              Now Playing\n"
 "                                  Space or P       Pause\n"
 "                                  Enter            Play\n"
+"                                  Q                Quit\n" 
 "                                  R                Repeat\n" 
 "                                  S                Shuffle\n" 
 "                                  ?                Search\n"
