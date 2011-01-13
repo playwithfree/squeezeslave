@@ -1,24 +1,52 @@
+2009-04-09 19:49  paddockd
+
+	* [r44] makepatch, squeezecenter_squeezeslave_player3-7.4.patch:
+	  Fixed makepatch script.
+	  Added 7.4 patch file.
+
+2009-04-09 19:48  paddockd
+
+	* [r43] Slim/Display/Lib/TextVFD.pm, Slim/Display/Text.pm,
+	  Slim/Networking/Slimproto.pm, Slim/Player/SqueezeSlave.pm,
+	  makepatch: Added r25816 from SC 7.4
+	  Modified files after SqueezeSlave Display patch applied and
+	  warning fix.
+	  Updated patch creation script for 7.4 files.
+
+2009-04-09 19:43  paddockd
+
+	* [r42] Slim/Display/Lib/TextVFD.pm, Slim/Display/Text.pm,
+	  Slim/Networking/Slimproto.pm, Slim/Player/SqueezeSlave.pm: Added
+	  r25808 files from SC 7.4.
+	  These are the files before Adrian applied the display patch.
+
+2009-03-14 11:06  paddockd
+
+	* [r37] ChangeLog, makepatch: Created ChangeLog.
+	  Updated creation script to copy patch files into squeezeslave
+	  tree.
+
 2009-03-13 11:41  paddockd
 
-	* Slim/Display/Text.pm, Slim/Networking/Slimproto.pm,
+	* [r36] Slim/Display/Text.pm, Slim/Networking/Slimproto.pm,
 	  Slim/Player/SqueezeSlave.pm, makepatch,
 	  squeezecenter_squeezeslave_player2-7.3.patch: Added patch
 	  creation script for BUG-11330 and created patch file.
 
 2009-03-13 11:24  paddockd
 
-	* Slim/Display/Lib/TextVFD.pm, Slim/Display/Text.pm: Merged
+	* [r35] Slim/Display/Lib/TextVFD.pm, Slim/Display/Text.pm: Merged
 	  variable display width changes from Text16 and Text16VFD into
 	  Text and TextVFD modules.
 
 2009-03-13 11:22  paddockd
 
-	* Slim/Display/Lib/TextVFD.pm, Slim/Display/Text.pm: Added Text.pm
-	  and TextVFD.pm from SqueezeCenter sources
+	* [r34] Slim/Display/Lib/TextVFD.pm, Slim/Display/Text.pm: Added
+	  Text.pm and TextVFD.pm from SqueezeCenter sources
 
 2009-03-11 11:46  paddockd
 
-	* Slim/Display/Lib/Text16VFD.pm, Slim/Display/Text16.pm,
+	* [r32] Slim/Display/Lib/Text16VFD.pm, Slim/Display/Text16.pm,
 	  Slim/Networking/Slimproto.pm, Slim/Player/SqueezeSlave.pm:
 	  Applied Graham Chapman 18 November 2008 display/lcdd/lircd
 	  patches to the current sources for opening a bug to have the
@@ -34,17 +62,18 @@
 
 2009-03-11 11:30  paddockd
 
-	* Slim/Display, Slim/Display/Lib, Slim/Display/Lib/Text16VFD.pm,
-	  Slim/Display/Text16.pm, Slim/Networking,
-	  Slim/Networking/Slimproto.pm, Slim/Player/SqueezeSlave.pm: Added
-	  7.4 r25453 files.
+	* [r31] Slim/Display, Slim/Display/Lib,
+	  Slim/Display/Lib/Text16VFD.pm, Slim/Display/Text16.pm,
+	  Slim/Networking, Slim/Networking/Slimproto.pm,
+	  Slim/Player/SqueezeSlave.pm: Added 7.4 r25453 files.
 
 2009-03-11 11:24  paddockd
 
-	* Slim/Player/SqueezeSlave.pm: Removed older initial versions.
+	* [r30] Slim/Player/SqueezeSlave.pm: Removed older initial
+	  versions.
 
 2009-02-24 13:23  paddockd
 
-	* ., Slim, Slim/Player, Slim/Player/SqueezeSlave.pm: Initial
+	* [r27] ., Slim, Slim/Player, Slim/Player/SqueezeSlave.pm: Initial
 	  SqueezeSlave.pm import r25135
 

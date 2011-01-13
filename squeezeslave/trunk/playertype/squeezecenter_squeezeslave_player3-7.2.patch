@@ -1,108 +1,5 @@
-Index: Slim/Player/SqueezeSlave.pm
-===================================================================
---- Slim/Player/SqueezeSlave.pm	(revision 31)
-+++ Slim/Player/SqueezeSlave.pm	(working copy)
-@@ -1,6 +1,6 @@
- package Slim::Player::SqueezeSlave;
- 
--# $Id: Squeezebox2.pm 12808 2007-08-31 04:08:54Z andy $
-+# $Id: SqueezeSlave.pm 12808 2007-08-31 04:08:54Z andy $
- 
- # SqueezeCenter Copyright 2001-2007 Logitech.
- # This program is free software; you can redistribute it and/or
-@@ -30,18 +30,19 @@
- use Slim::Utils::Misc;
- use Slim::Utils::Unicode;
- use Slim::Utils::Prefs;
-+use Slim::Display::Text; # For text display support
- 
- my $prefs = preferences('server');
- 
- our $defaultPrefs = {
- 	'replayGainMode'     => 0,
- 	'minSyncAdjust'      => 30,	# ms
-+	'maxBitrate'         => 0,
- };
- 
- # Keep track of direct stream redirects
- our $redirects = {};
- 
--
- sub new {
- 	my $class = shift;
- 
-@@ -74,7 +75,7 @@
- 
- sub modelName { 'Squeezeslave' }
- 
--sub hasIR { return 0; }
-+sub hasIR { return 1; }
- 
- # in order of preference based on whether we're connected via wired or wireless...
- sub formats {
-@@ -130,6 +131,17 @@
- 	}
- }
- 
-+sub canDoReplayGain {
-+	my $client = shift;
-+	my $replay_gain = shift;
-+
-+	if (defined($replay_gain)) {
-+		return $client->dBToFixed($replay_gain);
-+	}
-+
-+	return 0;
-+}
-+
- sub volume {
- 	my $client = shift;
- 	my $newvolume = shift;
-@@ -304,4 +316,27 @@
- }
- 
- 
-+# We need to implement this to allow us to receive SETD commands
-+# and we need SETD to support custom display widths
-+sub directBodyFrame { 
-+  return 1;
-+}
-+
-+# Allow the player to define it's display width
-+sub playerSettingsFrame {
-+	my $client   = shift;
-+	my $data_ref = shift;
-+	
-+        my $value;
-+        my $id = unpack('C', $$data_ref);
-+        
-+	# New SETD command 0xfe for display width
-+        if ($id == 0xfe) { 
-+        	$value = (unpack('CC', $$data_ref))[1];
-+                if ($value > 10 && $value < 200) {
-+		   $client->display->widthOverride(1, $value);
-+                } 
-+	}
-+}
-+
- 1;
-Index: Slim/Networking/Slimproto.pm
-===================================================================
---- Slim/Networking/Slimproto.pm	(revision 31)
-+++ Slim/Networking/Slimproto.pm	(working copy)
-@@ -1078,7 +1078,7 @@
- 	} elsif ($deviceids[$deviceid] eq 'squeezeslave') {
- 
- 		$client_class = 'Slim::Player::SqueezeSlave';
--		$display_class = 'Slim::Display::NoDisplay';
-+		$display_class = 'Slim::Display::Text';
- 
- 	} elsif ($deviceids[$deviceid] eq 'squeezeplay' || $deviceids[$deviceid] eq 'controller') {
- 
-Index: Slim/Display/Text.pm
-===================================================================
---- Slim/Display/Text.pm	(revision 34)
-+++ Slim/Display/Text.pm	(working copy)
+--- Slim/Display/Text.pm.orig	2009-01-23 17:05:47.000000000 -0500
++++ Slim/Display/Text.pm	2009-05-17 15:26:03.000000000 -0400
 @@ -14,8 +14,8 @@
  =head1 DESCRIPTION
  
@@ -118,17 +15,17 @@ Index: Slim/Display/Text.pm
  my $scroll_pad_scroll = 6; # chars of padding between scrolling text
  my $scroll_pad_ticker = 8; # chars of padding in ticker mode
  
-+my $defaultwidth = 40;     # default character width of display (unless client tells us otherwise)
++my $defaultWidth = 40;     # default character width of display (unless client tells us otherwise)
 +
  our $defaultPrefs = {
  	'doublesize'          => 0,
  	'offDisplaySize'      => 0,
-@@ -44,34 +46,7 @@
+@@ -44,33 +46,6 @@
  	'playingDisplayModes' => [0..5]
  };
  
 -# Display Modes
- 
+-
 -my @modes = (
 -	# mode 0
 -	{ desc => ['BLANK'],
@@ -154,29 +51,20 @@ Index: Slim/Display/Text.pm
 -);
 -
 -my $nmodes = $#modes;
--
+ 
  sub initPrefs {
  	my $display = shift;
- 
-@@ -79,6 +54,7 @@
- 		$prefs->set('loadFontsText', 1);
- 	}
- 
-+        $display->widthOverride(1,$defaultwidth);      # Set the display width
- 	$prefs->client($display->client)->init($defaultPrefs);
- 
- 	$display->SUPER::initPrefs();
-@@ -101,7 +77,8 @@
+@@ -101,7 +76,8 @@
  }
  
  sub displayWidth {
 -	return 40;
-+        my $width =  shift->widthOverride(@_);   # Get the width
-+	return $width || $defaultwidth;          # If not set (huh, we set it above!) return the default.
++	my $display = shift;
++	return $display->widthOverride || $defaultWidth;
  }
  
  sub vfdmodel {
-@@ -109,7 +86,6 @@
+@@ -109,7 +85,6 @@
  	my $client = $display->client;
  
  	if ($client->isa('Slim::Player::SLIMP3')) {
@@ -184,52 +72,38 @@ Index: Slim/Display/Text.pm
  		if ($client->revision >= 2.2) {
  			my $mac = $client->macaddress();
  			if ($mac eq '00:04:20:03:04:e0') {
-@@ -124,7 +100,8 @@
+@@ -124,7 +99,8 @@
  		} else {
  			return 'noritake-katakana';
  		}
 -
-+        } elsif ($client->isa('Slim::Player::SqueezeSlave')) {  
-+		return 'squeezeslave';  # New vfdmodel for squeezeslave, with different char map
++	} elsif ($client->isa('Slim::Player::SqueezeSlave')) {  
++		return 'squeezeslave';
  	} else {
  		# Squeezebox 1
  		return 'noritake-european';
-@@ -184,6 +161,7 @@
- 
- 	my $screen;                     # screen definition to render
- 	my $sc = $cache->{screen1};     # screen cache for this screen
-+        my $newdisplaysize = 0;		# Used to force re-render when line length changes
- 
- 	if (!exists($parts->{screen1}) && 
- 		(exists($parts->{line}) || exists($parts->{center}) || exists($parts->{overlay}) || 
-@@ -199,10 +177,15 @@
+@@ -198,11 +174,11 @@
+ 	$sc->{newscroll} = 0;
  	$sc->{present} = 1;
  
- 	# force initialisation of cache if size = 0 (used to init cache)
+-	# force initialisation of cache if size = 0 (used to init cache)
 -	if ($sc->{ssize} != 40) {
 -		$sc->{ssize} = 40;
++	# force (re)initialisation of cache if size changed
 +	if ($sc->{ssize} != $display->displayWidth) {
  		$sc->{double} = 0;
  		$sc->{changed} = 1;
-+        	
-+		# Size has changed
-+           	if ($sc->{ssize} >0) {
-+			$newdisplaysize = 1;
-+		}
 +		$sc->{ssize} = $display->displayWidth;
  	}
  
  	# check display hash for text size definitions
-@@ -231,13 +214,14 @@
- 
+@@ -232,12 +208,13 @@
  	if ($sc->{changed}) {
  		foreach my $l (0..1) {
--			$sc->{line}[$l] = undef; $sc->{linetext}[$l] = ''; $sc->{linefinish}[$l] = 0;
+ 			$sc->{line}[$l] = undef; $sc->{linetext}[$l] = ''; $sc->{linefinish}[$l] = 0;
 -			$sc->{overlay}[$l] = undef; $sc->{overlaytext}[$l] = ''; $sc->{overlaystart}[$l] = 40;
--			$sc->{center}[$l] = undef; $sc->{centertext}[$l] = '';
-+			$sc->{line}[$l] = undef if (!$newdisplaysize); $sc->{linetext}[$l] = ''; $sc->{linefinish}[$l] = 0;
-+			$sc->{overlay}[$l] = undef if (!$newdisplaysize); $sc->{overlaytext}[$l] = ''; $sc->{overlaystart}[$l] = $display->displayWidth;
-+			$sc->{center}[$l] = undef if (!$newdisplaysize); $sc->{centertext}[$l] = '';
++			$sc->{overlay}[$l] = undef; $sc->{overlaytext}[$l] = ''; $sc->{overlaystart}[$l] = $display->displayWidth;
+ 			$sc->{center}[$l] = undef; $sc->{centertext}[$l] = '';
  		}
  		$sc->{scroll} = 0;
  		$sc->{scrollline} = undef;
@@ -238,41 +112,7 @@ Index: Slim/Display/Text.pm
  	if (!$scroll) { 
  		$sc->{scroll} = 0;
  		$sc->{scrollline} = undef;
-@@ -251,20 +235,20 @@
- 	# lines - render if changed 
- 	foreach my $l (0..1) {
- 		if (defined($screen->{line}[$l]) && 
--			(!defined($sc->{line}[$l]) || ($screen->{line}[$l] ne $sc->{line}[$l]))) {
-+			($newdisplaysize || !defined($sc->{line}[$l]) || ($screen->{line}[$l] ne $sc->{line}[$l]))) {
- 			$sc->{line}[$l] = $screen->{line}[$l];
- 			next if ($double && $l == 0);
- 			if (!$double) {
- 				if (Slim::Utils::Unicode::encodingFromString($screen->{line}[$l]) eq 'raw') {
- 					# SliMP3 / Pre-G can't handle wide characters outside the latin1 range - turn off the utf8 flag.
--					$sc->{linetext}[$l] = Slim::Utils::Unicode::utf8off($screen->{line}[$l]);
-+					$sc->{linetext}[$l] = Slim::Utils::Unicode::utf8off($sc->{line}[$l]);
- 				} else {
--					$sc->{linetext}[$l] = $screen->{line}[$l];
-+					$sc->{linetext}[$l] = $sc->{line}[$l];
- 				}
- 				$sc->{linefinish}[$l] = lineLength($sc->{linetext}[$l]);
- 			} else {
- 				($sc->{linetext}[0], $sc->{linetext}[1]) =
--					Slim::Display::Lib::TextVFD::doubleSize($client,$screen->{line}[1]);
-+					Slim::Display::Lib::TextVFD::doubleSize($client,$sc->{line}[1]);
- 				$sc->{linefinish}[0] = lineLength($sc->{linetext}[0]);
- 				$sc->{linefinish}[1] = lineLength($sc->{linetext}[1]);
- 			}
-@@ -291,24 +275,24 @@
- 	# overlays - render if changed
- 	foreach my $l (0..1) {
- 		if (defined($screen->{overlay}[$l]) && 
--			(!defined($sc->{overlay}[$l]) || ($screen->{overlay}[$l] ne $sc->{overlay}[$l]))) {
-+			($newdisplaysize || !defined($sc->{overlay}[$l]) || ($screen->{overlay}[$l] ne $sc->{overlay}[$l]))) {
- 			$sc->{overlay}[$l] = $screen->{overlay}[$l];
- 			if (!$double || $displayoverlays) {
--				$sc->{overlaytext}[$l] = $screen->{overlay}[$l];
-+				$sc->{overlaytext}[$l] = $sc->{overlay}[$l];
+@@ -298,17 +275,17 @@
  			} else {
  				$sc->{overlaytext}[$l] = '';
  			}
@@ -295,34 +135,29 @@ Index: Slim/Display/Text.pm
  			$sc->{changed} = 1;
  		}
  	}
-@@ -316,26 +300,26 @@
- 	# centered lines - render if changed
- 	foreach my $l (0..1) {
- 		if (defined($screen->{center}[$l]) &&
--			(!defined($sc->{center}[$l]) || ($screen->{center}[$l] ne $sc->{center}[$l]))) {
-+			($newdisplaysize || (!defined($sc->{center}[$l]) || ($screen->{center}[$l] ne $sc->{center}[$l])))) {
+@@ -320,22 +297,22 @@
  			$sc->{center}[$l] = $screen->{center}[$l];
  			next if ($double && $l == 0);
  			if (!$double) {
- 				my $len = lineLength($sc->{center}[$l]); 
+-				my $len = lineLength($sc->{center}[$l]); 
 -				if ($len < 39) {
 -					$sc->{centertext}[$l] = ' ' x ((40 - $len)/2) . $screen->{center}[$l] . 
 -						' ' x (40 - $len - int((40 - $len)/2));
-+				if ($len < $display->displayWidth-1) {
-+					$sc->{centertext}[$l] = ' ' x (($display->displayWidth - $len)/2) . $sc->{center}[$l] . 
++				my $len = lineLength($screen->{center}[$l]); 
++				if ($len < $display->displayWidth - 1) {
++					$sc->{centertext}[$l] = ' ' x (($display->displayWidth - $len)/2) . $screen->{center}[$l] . 
 +						' ' x ($display->displayWidth - $len - int(($display->displayWidth - $len)/2));
  				} else {
 -					$sc->{centertext}[$l] = subString($sc->{center}[$l] . ' ', 0 ,40);
-+					$sc->{centertext}[$l] = subString($sc->{center}[$l] . ' ', 0 ,$display->displayWidth);
++					$sc->{centertext}[$l] = subString($screen->{center}[$l] . ' ', 0, $display->displayWidth);
  				}
  			} else {
--				my ($center1, $center2) = Slim::Display::Lib::TextVFD::doubleSize($client,$screen->{center}[1]);
-+				my ($center1, $center2) = Slim::Display::Lib::TextVFD::doubleSize($client,$sc->{center}[1]);
+ 				my ($center1, $center2) = Slim::Display::Lib::TextVFD::doubleSize($client,$screen->{center}[1]);
  				my $len = lineLength($center1);
 -				if ($len < 39) {
 -					$sc->{centertext}[0] = ' ' x ((40 - $len)/2) . $center1 . ' ' x (40 - $len - int((40 - $len)/2));
 -					$sc->{centertext}[1] = ' ' x ((40 - $len)/2) . $center2 . ' ' x (40 - $len - int((40 - $len)/2));
-+				if ($len < $display->displayWidth-1) {
++				if ($len < $display->displayWidth - 1) {
 +					$sc->{centertext}[0] = ' ' x (($display->displayWidth - $len)/2) . $center1 . ' ' x ($display->displayWidth - $len - int(($display->displayWidth - $len)/2));
 +					$sc->{centertext}[1] = ' ' x (($display->displayWidth - $len)/2) . $center2 . ' ' x ($display->displayWidth - $len - int(($display->displayWidth - $len)/2));
  				} else {
@@ -333,29 +168,7 @@ Index: Slim/Display/Text.pm
  				}
  			}
  			$sc->{changed} = 1;
-@@ -401,21 +385,17 @@
- 			# centered text takes precedence
- 			$line = subString($sc->{centertext}[$l], 0, $sc->{overlaystart}[$l]). 
- 				$sc->{overlaytext}[$l];
--
- 		} elsif ($sc->{linefinish}[$l] <= $sc->{overlaystart}[$l] ) {
- 			# no need to scroll - assemble line + pad + overlay
- 			$line = $sc->{linetext}[$l] . ' ' x ($sc->{overlaystart}[$l] - $sc->{linefinish}[$l]) . 
- 				$sc->{overlaytext}[$l];
--
- 		} elsif (!$scroll || ($sc->{scroll} && $sc->{scrollline} != $l) ) {
- 			# scrolling not enabled or already scrolling for another line - truncate line
- 			$line = subString($sc->{linetext}[$l], 0, $sc->{overlaystart}[$l]) .
- 				$sc->{overlaytext}[$l];
--
- 		} elsif ($sc->{scroll} && $sc->{scrollline} == $l) {
- 			# scrolling already on this line - add overlay only
- 			$line = ' ' x $sc->{overlaystart}[$l] . $sc->{overlaytext}[$l];
--
- 		} else {
- 			# scrolling allowed and not currently scrolling - create scrolling state
- 
-@@ -426,11 +406,11 @@
+@@ -426,11 +403,11 @@
  			$sc->{scrollstart} = 0;
  			if ($scroll == 1) {
  				# normal wrapped text scrolling
@@ -369,15 +182,7 @@ Index: Slim/Display/Text.pm
  			}
  
  			if (!$double || $l == 0) {
-@@ -445,7 +425,6 @@
- 			# add overlay only to static bitmap
- 			$line = ' ' x $sc->{overlaystart}[$l] . $sc->{overlaytext}[$l];
- 		}
--
- 		$sc->{lineref}[$l] = \$line;
- 	}
- 
-@@ -472,7 +451,7 @@
+@@ -472,7 +449,7 @@
  	my $line2 = $$line2start . $$line2end;
  
  	$display->killAnimation();
@@ -386,7 +191,7 @@ Index: Slim/Display/Text.pm
  }
  
  sub pushRight {
-@@ -489,7 +468,7 @@
+@@ -489,7 +466,7 @@
  	my $line2 = $$line2end . $$line2start;
  
  	$display->killAnimation();
@@ -395,7 +200,7 @@ Index: Slim/Display/Text.pm
  }
  
  sub pushUp {
-@@ -536,9 +515,12 @@
+@@ -536,9 +513,12 @@
  	my ($line1, $line2, $offset, $delta, $end, $deltatime) = @$params;
  	
  	$offset += $delta;
@@ -410,7 +215,7 @@ Index: Slim/Display/Text.pm
  
  	Slim::Display::Lib::TextVFD::vfdUpdate($display->client, $screenline1, $screenline2);		
  
-@@ -556,7 +538,7 @@
+@@ -556,7 +536,7 @@
  
  	my $render = $display->render($display->renderCache());
  	my $line1 = ${$render->{screen1}->{lineref}[1]};
@@ -419,7 +224,7 @@ Index: Slim/Display/Text.pm
  
  	Slim::Display::Lib::TextVFD::vfdUpdate($display->client, $line1, $line2);		
  
-@@ -569,7 +551,7 @@
+@@ -569,7 +549,7 @@
  	my $display = shift;
  
  	my $render = $display->render($display->renderCache());
@@ -428,53 +233,48 @@ Index: Slim/Display/Text.pm
  	my $line2 = ${$render->{screen1}->{lineref}[0]};
  
  	Slim::Display::Lib::TextVFD::vfdUpdate($display->client, $line1, $line2);		
-@@ -598,11 +580,43 @@
+@@ -598,12 +578,37 @@
  }
  
  sub modes {
--	return \@modes;
-+   my $display = shift;
-+   # Display Modes
-+
-+   my @modes = (
-+	# mode 0
-+	{ desc => ['BLANK'],
-+	  bar => 0, secs => 0,  width => $display->displayWidth, },
-+	# mode 1
-+	{ desc => ['ELAPSED'],
-+	  bar => 0, secs => 1,  width => $display->displayWidth, },
-+	# mode 2
-+	{ desc => ['REMAINING'],
-+	  bar => 0, secs => -1, width => $display->displayWidth, },
-+	# mode 3
-+	{ desc => ['PROGRESS_BAR'],
-+	  bar => 1, secs => 0,  width => $display->displayWidth, },
-+	# mode 4
-+	{ desc => ['ELAPSED', 'AND', 'PROGRESS_BAR'],
-+	  bar => 1, secs => 1,  width => $display->displayWidth, },
-+	# mode 5
-+	{ desc => ['REMAINING', 'AND', 'PROGRESS_BAR'],
-+	  bar => 1, secs => -1, width => $display->displayWidth, },
-+	# mode 6
-+	{ desc => ['SETUP_SHOWBUFFERFULLNESS'],
-+	  bar => 1, secs => 0,  width => $display->displayWidth, fullness => 1, },
-+   );
-+
-+   return \@modes;
++	my $display = shift;
++	# Display Modes
++	
++	my @modes = (
++		# mode 0
++		{ desc => ['BLANK'],
++		  bar => 0, secs => 0,  width => $display->displayWidth, },
++		# mode 1
++		{ desc => ['ELAPSED'],
++		  bar => 0, secs => 1,  width => $display->displayWidth, },
++		# mode 2
++		{ desc => ['REMAINING'],
++		  bar => 0, secs => -1, width => $display->displayWidth, },
++		# mode 3
++		{ desc => ['PROGRESS_BAR'],
++		  bar => 1, secs => 0,  width => $display->displayWidth, },
++		# mode 4
++		{ desc => ['ELAPSED', 'AND', 'PROGRESS_BAR'],
++		  bar => 1, secs => 1,  width => $display->displayWidth, },
++		# mode 5
++		{ desc => ['REMAINING', 'AND', 'PROGRESS_BAR'],
++		  bar => 1, secs => -1, width => $display->displayWidth, },
++		# mode 6
++		{ desc => ['SETUP_SHOWBUFFERFULLNESS'],
++		  bar => 1, secs => 0,  width => $display->displayWidth, fullness => 1, },
++	   );
++	
+ 	return \@modes;
  }
  
- sub nmodes {
+-sub nmodes {
 -	return $nmodes;
-+   my $display = shift;
-+
-+   my @modes = @{$display->modes};
-+   my $nmodes = $#modes;
-+   warn ("nmodes = $nmodes\n");
-+   return $nmodes;
- }
+-}
++sub nmodes { 6 }
  
  sub scrollUpdateDisplay {
-@@ -637,11 +651,11 @@
+ 	# update scrolling for character display
+@@ -637,11 +642,11 @@
  	} else {
  		# both lines scrolling
  		if ($padlen) {
@@ -490,10 +290,8 @@ Index: Slim/Display/Text.pm
  		}
  	}
  
-Index: Slim/Display/Lib/TextVFD.pm
-===================================================================
---- Slim/Display/Lib/TextVFD.pm	(revision 34)
-+++ Slim/Display/Lib/TextVFD.pm	(working copy)
+--- Slim/Display/Lib/TextVFD.pm.orig	2009-01-23 17:05:47.000000000 -0500
++++ Slim/Display/Lib/TextVFD.pm	2009-05-17 15:26:03.000000000 -0400
 @@ -66,7 +66,6 @@
  
  my $vfdReset = $vfdCodeCmd . $vfdCommand{"INCSC"} . $vfdCodeCmd . $vfdCommand{"HOME"};
@@ -542,24 +340,24 @@ Index: Slim/Display/Lib/TextVFD.pm
  	my $cur = -1;
  	my $pos;
  
-+        my $displaywidth = $client->display->displayWidth; # Get display width (replaces originally hard coded values below)
++	my $displaywidth = $client->display->displayWidth;
 +	my $spaces = ' ' x $displaywidth;
 +
  	# convert to the VFD char set
  	my $lang = $client->vfdmodel;
  	if (!$lang) { 
-@@ -224,8 +248,9 @@
- 	foreach my $custom (keys %newCustom) {
+@@ -225,7 +249,9 @@
  
  		my $encodedCustom = "\x1F" . $custom . "\x1F";
-+		my $maxcustom = $lang eq "squeezeslave" ? 0:8; # squeezeslave doesn't allow any custom character definitions
  
 -		if ($usedCustom < 8) { # Room to add this one
-+		if ($usedCustom < $maxcustom) { # Room to add this one
++		my $maxCustom = $lang eq "squeezeslave" ? 0 : 8; # squeezeslave doesn't allow any custom character definitions
++
++		if ($usedCustom < $maxCustom) { # Room to add this one
  
  			while(defined $customUsed{$nextChr}) {
  
-@@ -266,7 +291,6 @@
+@@ -266,7 +292,6 @@
  			delete $newCustom{$custom};
  		}
  	}
@@ -567,7 +365,7 @@ Index: Slim/Display/Lib/TextVFD.pm
  	if ($lang eq 'european') {
  		# why can't we all just get along?
  		$line =~ tr{\x1f\x92\xa1\xa2\xa3\xa4\xa5\xa6\xa8\xa9\xab\xad\xaf \xbb\xbf \xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf \xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf \xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef \xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff}
-@@ -275,8 +299,9 @@
+@@ -275,8 +300,9 @@
  		# translate iso8859-1 to vfd charset
  		$line =~ tr{\x1f\x92\x0e\x0f\x5c\x70\x7e\x7f\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff}
  				   {\xff\x27\x19\x7e\x8c\xf0\x8e\x8f\x20\x98\xec\x92\xeb\x5c\x98\x8f\xde\x63\x61\x3c\xa3\x2d\x72\xb0\xdf\xb7\x32\x33\x60\xe4\xf1\x94\x2c\x31\xdf\x3e\x25\x25\x25\x3f\x81\x81\x82\x82\x80\x81\x90\x99\x45\x45\x45\x45\x49\x49\x49\x49\x44\xee\x4f\x4f\x4f\x4f\x86\x78\x30\x55\x55\x55\x8a\x59\x70\xe2\x84\x83\x84\x84\xe1\x84\x91\x99\x65\x65\x65\x65\x69\x69\x69\x69\x95\xee\x6f\x6f\x6f\x6f\xef\xfd\x88\x75\x75\x75\xf5\x79\xf0\x79};	
@@ -578,7 +376,7 @@ Index: Slim/Display/Lib/TextVFD.pm
  		$line =~ tr{\x92}
  				   {\x26};
  	};
-@@ -287,9 +312,10 @@
+@@ -287,9 +313,10 @@
  	my $vfdmodel = $client->vfdmodel();
  
  	# force the display out of 4 bit mode if it got there somehow, then set the brightness
@@ -586,11 +384,11 @@ Index: Slim/Display/Lib/TextVFD.pm
  	if ( $vfdmodel =~ 'futaba') {
  		$vfddata .= $vfdCodeCmd .  $vfdBrightFutaba[$brightness];
 -	} else {
-+	} elsif ( ! ($vfdmodel =~ 'squeezeslave')) { 
++	} elsif ( $vfdmodel ne 'squeezeslave') { 
  		$vfddata .= $noritakeBrightPrelude . $vfdBright[$brightness];
  	}
  
-@@ -310,17 +336,17 @@
+@@ -310,17 +337,17 @@
  	$line =~ s/(.)/$vfdCodeChar$1/gos;
  
  	# split the line in two and move the cursor to the second line
@@ -611,3 +409,130 @@ Index: Slim/Display/Lib/TextVFD.pm
  		}
  
  		# turn on  the cursor			
+--- Slim/Networking/Slimproto.pm.orig	2009-01-23 17:05:33.000000000 -0500
++++ Slim/Networking/Slimproto.pm	2009-05-17 15:26:03.000000000 -0400
+@@ -1048,7 +1048,7 @@
+ 	} elsif ($deviceids[$deviceid] eq 'squeezeslave') {
+ 
+ 		$client_class = 'Slim::Player::SqueezeSlave';
+-		$display_class = 'Slim::Display::NoDisplay';
++		$display_class = 'Slim::Display::Text';
+ 
+ 	} else {
+ 
+--- Slim/Player/SqueezeSlave.pm.orig	2009-01-23 17:05:34.000000000 -0500
++++ Slim/Player/SqueezeSlave.pm	2009-05-17 15:28:41.000000000 -0400
+@@ -1,6 +1,6 @@
+ package Slim::Player::SqueezeSlave;
+ 
+-# $Id: Squeezebox2.pm 12808 2007-08-31 04:08:54Z andy $
++# $Id$
+ 
+ # SqueezeCenter Copyright 2001-2007 Logitech.
+ # This program is free software; you can redistribute it and/or
+@@ -37,12 +37,12 @@
+ our $defaultPrefs = {
+ 	'replayGainMode'     => 0,
+ 	'minSyncAdjust'      => 30,	# ms
++	'maxBitrate'         => 0,
+ };
+ 
+ # Keep track of direct stream redirects
+ our $redirects = {};
+ 
+-
+ sub new {
+ 	my $class = shift;
+ 
+@@ -78,8 +78,11 @@
+ sub model {
+ 	return 'squeezeslave';
+ }
++
+ sub modelName { 'Squeezeslave' }
+ 
++sub hasIR { return 1; }
++
+ # in order of preference based on whether we're connected via wired or wireless...
+ sub formats {
+ 	my $client = shift;
+@@ -119,6 +122,7 @@
+  );
+ 
+ sub dBToFixed {
++	my $client = shift;
+ 	my $db = shift;
+ 
+ 	# Map a floating point dB value to a 16.16 fixed point value to
+@@ -134,12 +138,23 @@
+ 	}
+ }
+ 
++sub canDoReplayGain {
++	my $client = shift;
++	my $replay_gain = shift;
++
++	if (defined($replay_gain)) {
++		return $client->dBToFixed($replay_gain);
++	}
++
++	return 0;
++}
++
+ sub volume {
+ 	my $client = shift;
+ 	my $newvolume = shift;
+ 
+ 	my $volume = $client->Slim::Player::Client::volume($newvolume, @_);
+-	my $preamp = 255 - int(2 * $prefs->client($client)->get('preampVolumeControl'));
++	my $preamp = 255 - int(2 * ($prefs->client($client)->get('preampVolumeControl') || 0));
+ 
+ 	if (defined($newvolume)) {
+ 		# Old style volume:
+@@ -153,7 +168,7 @@
+ 			# With new style volume, let's try -49.5dB as the lowest
+ 			# value.
+ 			my $db = ($volume - 100)/2;	
+-			$newGain = dBToFixed($db);
++			$newGain = $client->dBToFixed($db);
+ 		}
+ 
+ 		my $data = pack('NNCCNN', $oldGain, $oldGain, $prefs->client($client)->get('digitalVolumeControl'), $preamp, $newGain, $newGain);
+@@ -213,6 +228,9 @@
+ sub hasDigitalOut {
+ 	return 0;
+ }
++sub hasPowerControl {
++	return 0;
++}
+ 
+ sub pcm_sample_rates {
+ 	my $client = shift;
+@@ -246,4 +264,27 @@
+ 	);
+ }
+ 
++# We need to implement this to allow us to receive SETD commands
++# and we need SETD to support custom display widths
++sub directBodyFrame { 
++  return 1;
++}
++
++# Allow the player to define it's display width
++sub playerSettingsFrame {
++	my $client   = shift;
++	my $data_ref = shift;
++	
++        my $value;
++        my $id = unpack('C', $$data_ref);
++        
++	# New SETD command 0xfe for display width
++        if ($id == 0xfe) { 
++        	$value = (unpack('CC', $$data_ref))[1];
++                if ($value > 10 && $value < 200) {
++		   $client->display->widthOverride(1, $value);
++                } 
++	}
++}
++
+ 1;

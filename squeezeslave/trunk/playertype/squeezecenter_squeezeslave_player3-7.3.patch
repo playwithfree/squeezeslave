@@ -1,127 +1,5 @@
-Index: Slim/Player/SqueezeSlave.pm
-===================================================================
---- Slim/Player/SqueezeSlave.pm	(revision 42)
-+++ Slim/Player/SqueezeSlave.pm	(working copy)
-@@ -1,6 +1,6 @@
- package Slim::Player::SqueezeSlave;
- 
--# $Id: Squeezebox2.pm 12808 2007-08-31 04:08:54Z andy $
-+# $Id$
- 
- # SqueezeCenter Copyright 2001-2007 Logitech.
- # This program is free software; you can redistribute it and/or
-@@ -36,22 +36,9 @@
- our $defaultPrefs = {
- 	'replayGainMode'     => 0,
- 	'minSyncAdjust'      => 30,	# ms
-+	'maxBitrate'         => 0,  # no bitrate limiting
- };
- 
--# Keep track of direct stream redirects
--our $redirects = {};
--
--
--sub new {
--	my $class = shift;
--
--	my $client = $class->SUPER::new(@_);
--
--	bless $client, $class;
--
--	return $client;
--}
--
- sub initPrefs {
- 	my $client = shift;
- 
-@@ -74,7 +61,7 @@
- 
- sub modelName { 'Squeezeslave' }
- 
--sub hasIR { return 0; }
-+sub hasIR { 1 }
- 
- # in order of preference based on whether we're connected via wired or wireless...
- sub formats {
-@@ -130,12 +117,23 @@
- 	}
- }
- 
-+sub canDoReplayGain {
-+	my $client = shift;
-+	my $replay_gain = shift;
-+
-+	if (defined($replay_gain)) {
-+		return $client->dBToFixed($replay_gain);
-+	}
-+
-+	return 0;
-+}
-+
- sub volume {
- 	my $client = shift;
- 	my $newvolume = shift;
- 
- 	my $volume = $client->Slim::Player::Client::volume($newvolume, @_);
--	my $preamp = 255 - int(2 * $prefs->client($client)->get('preampVolumeControl'));
-+	my $preamp = 255 - int(2 * ($prefs->client($client)->get('preampVolumeControl') || 0));
- 
- 	if (defined($newvolume)) {
- 		# Old style volume:
-@@ -304,4 +302,28 @@
- }
- 
- 
-+# We need to implement this to allow us to receive SETD commands
-+# and we need SETD to support custom display widths
-+sub directBodyFrame { 
-+	return 1;
-+}
-+
-+# Allow the player to define it's display width
-+sub playerSettingsFrame {
-+	my $client   = shift;
-+	my $data_ref = shift;
-+	
-+	my $value;
-+	my $id = unpack('C', $$data_ref);
-+        
-+	# New SETD command 0xfe for display width
-+	if ($id == 0xfe) { 
-+		$value = (unpack('CC', $$data_ref))[1];
-+		if ($value > 10 && $value < 200) {
-+			$client->display->widthOverride(1, $value);
-+			$client->update;
-+		} 
-+	}
-+}
-+
- 1;
-Index: Slim/Networking/Slimproto.pm
-===================================================================
---- Slim/Networking/Slimproto.pm	(revision 42)
-+++ Slim/Networking/Slimproto.pm	(working copy)
-@@ -1,6 +1,6 @@
- package Slim::Networking::Slimproto;
- 
--# $Id: Slimproto.pm 25682 2009-03-24 15:10:27Z andy $
-+# $Id: Slimproto.pm 25809 2009-04-03 20:27:13Z adrian $
- 
- # SqueezeCenter Copyright 2001-2007 Logitech.
- # This program is free software; you can redistribute it and/or
-@@ -1081,7 +1081,7 @@
- 	} elsif ($deviceids[$deviceid] eq 'squeezeslave') {
- 
- 		$client_class = 'Slim::Player::SqueezeSlave';
--		$display_class = 'Slim::Display::NoDisplay';
-+		$display_class = 'Slim::Display::Text';
- 
- 	} elsif ($deviceids[$deviceid] eq 'squeezeplay' || $deviceids[$deviceid] eq 'controller') {
- 
-Index: Slim/Display/Text.pm
-===================================================================
---- Slim/Display/Text.pm	(revision 42)
-+++ Slim/Display/Text.pm	(working copy)
+--- Slim/Display/Text.pm.orig	2009-05-17 14:12:20.000000000 -0400
++++ Slim/Display/Text.pm	2009-04-10 06:17:24.000000000 -0400
 @@ -5,7 +5,7 @@
  # modify it under the terms of the GNU General Public License,
  # version 2.
@@ -151,12 +29,12 @@ Index: Slim/Display/Text.pm
  our $defaultPrefs = {
  	'doublesize'          => 0,
  	'offDisplaySize'      => 0,
-@@ -44,34 +46,7 @@
+@@ -44,33 +46,6 @@
  	'playingDisplayModes' => [0..5]
  };
  
 -# Display Modes
- 
+-
 -my @modes = (
 -	# mode 0
 -	{ desc => ['BLANK'],
@@ -182,10 +60,9 @@ Index: Slim/Display/Text.pm
 -);
 -
 -my $nmodes = $#modes;
--
+ 
  sub initPrefs {
  	my $display = shift;
- 
 @@ -101,7 +76,8 @@
  }
  
@@ -422,10 +299,8 @@ Index: Slim/Display/Text.pm
  		}
  	}
  
-Index: Slim/Display/Lib/TextVFD.pm
-===================================================================
---- Slim/Display/Lib/TextVFD.pm	(revision 42)
-+++ Slim/Display/Lib/TextVFD.pm	(working copy)
+--- Slim/Display/Lib/TextVFD.pm.orig	2009-05-17 14:12:20.000000000 -0400
++++ Slim/Display/Lib/TextVFD.pm	2009-04-10 06:17:24.000000000 -0400
 @@ -5,7 +5,7 @@
  # modify it under the terms of the GNU General Public License, 
  # version 2.
@@ -489,18 +364,17 @@ Index: Slim/Display/Lib/TextVFD.pm
  	# convert to the VFD char set
  	my $lang = $client->vfdmodel;
  	if (!$lang) { 
-@@ -225,8 +249,10 @@
+@@ -225,7 +249,9 @@
  
  		my $encodedCustom = "\x1F" . $custom . "\x1F";
  
 -		if ($usedCustom < 8) { # Room to add this one
 +		my $maxCustom = $lang eq "squeezeslave" ? 0 : 8; # squeezeslave doesn't allow any custom character definitions
- 
-+		if ($usedCustom < $maxCustom) { # Room to add this one
 +
++		if ($usedCustom < $maxCustom) { # Room to add this one
+ 
  			while(defined $customUsed{$nextChr}) {
  
- 				$nextChr = chr(ord($nextChr)+1);
 @@ -266,7 +292,6 @@
  			delete $newCustom{$custom};
  		}
@@ -553,3 +427,138 @@ Index: Slim/Display/Lib/TextVFD.pm
  		}
  
  		# turn on  the cursor			
+--- Slim/Networking/Slimproto.pm.orig	2009-05-17 14:12:37.000000000 -0400
++++ Slim/Networking/Slimproto.pm	2009-04-10 06:17:15.000000000 -0400
+@@ -1081,7 +1081,7 @@
+ 	} elsif ($deviceids[$deviceid] eq 'squeezeslave') {
+ 
+ 		$client_class = 'Slim::Player::SqueezeSlave';
+-		$display_class = 'Slim::Display::NoDisplay';
++		$display_class = 'Slim::Display::Text';
+ 
+ 	} elsif ($deviceids[$deviceid] eq 'squeezeplay' || $deviceids[$deviceid] eq 'controller') {
+ 
+--- Slim/Player/SqueezeSlave.pm.orig	2009-05-17 14:12:44.000000000 -0400
++++ Slim/Player/SqueezeSlave.pm	2009-05-17 14:14:19.000000000 -0400
+@@ -1,6 +1,6 @@
+ package Slim::Player::SqueezeSlave;
+ 
+-# $Id: Squeezebox2.pm 12808 2007-08-31 04:08:54Z andy $
++# $Id$
+ 
+ # SqueezeCenter Copyright 2001-2007 Logitech.
+ # This program is free software; you can redistribute it and/or
+@@ -36,22 +36,9 @@
+ our $defaultPrefs = {
+ 	'replayGainMode'     => 0,
+ 	'minSyncAdjust'      => 30,	# ms
++	'maxBitrate'         => 0,  # no bitrate limiting
+ };
+ 
+-# Keep track of direct stream redirects
+-our $redirects = {};
+-
+-
+-sub new {
+-	my $class = shift;
+-
+-	my $client = $class->SUPER::new(@_);
+-
+-	bless $client, $class;
+-
+-	return $client;
+-}
+-
+ sub initPrefs {
+ 	my $client = shift;
+ 
+@@ -74,7 +61,7 @@
+ 
+ sub modelName { 'Squeezeslave' }
+ 
+-sub hasIR { return 0; }
++sub hasIR { 1 }
+ 
+ # in order of preference based on whether we're connected via wired or wireless...
+ sub formats {
+@@ -115,6 +102,7 @@
+  );
+ 
+ sub dBToFixed {
++	my $client = shift;
+ 	my $db = shift;
+ 
+ 	# Map a floating point dB value to a 16.16 fixed point value to
+@@ -130,12 +118,23 @@
+ 	}
+ }
+ 
++sub canDoReplayGain {
++	my $client = shift;
++	my $replay_gain = shift;
++
++	if (defined($replay_gain)) {
++		return $client->dBToFixed($replay_gain);
++	}
++
++	return 0;
++}
++
+ sub volume {
+ 	my $client = shift;
+ 	my $newvolume = shift;
+ 
+ 	my $volume = $client->Slim::Player::Client::volume($newvolume, @_);
+-	my $preamp = 255 - int(2 * $prefs->client($client)->get('preampVolumeControl'));
++	my $preamp = 255 - int(2 * ($prefs->client($client)->get('preampVolumeControl') || 0));
+ 
+ 	if (defined($newvolume)) {
+ 		# Old style volume:
+@@ -149,7 +148,7 @@
+ 			# With new style volume, let's try -49.5dB as the lowest
+ 			# value.
+ 			my $db = ($volume - 100)/2;	
+-			$newGain = dBToFixed($db);
++			$newGain = $client->dBToFixed($db);
+ 		}
+ 
+ 		my $data = pack('NNCCNN', $oldGain, $oldGain, $prefs->client($client)->get('digitalVolumeControl'), $preamp, $newGain, $newGain);
+@@ -205,6 +204,9 @@
+ sub hasDigitalOut {
+ 	return 0;
+ }
++sub hasPowerControl {
++	return 0;
++}
+ 
+ sub pcm_sample_rates {
+ 	my $client = shift;
+@@ -304,4 +306,28 @@
+ }
+ 
+ 
++# We need to implement this to allow us to receive SETD commands
++# and we need SETD to support custom display widths
++sub directBodyFrame { 
++	return 1;
++}
++
++# Allow the player to define it's display width
++sub playerSettingsFrame {
++	my $client   = shift;
++	my $data_ref = shift;
++	
++	my $value;
++	my $id = unpack('C', $$data_ref);
++        
++	# New SETD command 0xfe for display width
++	if ($id == 0xfe) { 
++		$value = (unpack('CC', $$data_ref))[1];
++		if ($value > 10 && $value < 200) {
++			$client->display->widthOverride(1, $value);
++			$client->update;
++		} 
++	}
++}
++
+ 1;
