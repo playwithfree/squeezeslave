@@ -1,3 +1,12 @@
+2011-01-13 13:16  paddockd
+
+	* [r228] ChangeLog, squeezecenter_squeezeslave_player2-7.3.patch,
+	  squeezecenter_squeezeslave_player3-7.2.patch,
+	  squeezecenter_squeezeslave_player3-7.3.patch,
+	  squeezecenter_squeezeslave_player3-7.4.patch: Removed obsolete
+	  display/replay gain patches.
+	  Captured current display/replay gain patches.
+
 2009-04-09 19:49  paddockd
 
 	* [r44] makepatch, squeezecenter_squeezeslave_player3-7.4.patch:
