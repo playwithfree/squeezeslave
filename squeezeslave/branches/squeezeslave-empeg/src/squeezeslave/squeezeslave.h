@@ -67,9 +67,14 @@
 #define RETRY_DEFAULT	5
 #define LINE_COUNT	2
 #define OPTLEN		64
-#define FIRMWARE_VERSION	5
 #define SLIMPROTOCOL_PORT	3483
+#ifdef EMPEG
+#define PLAYER_TYPE	13
+#define FIRMWARE_VERSION	1
+#else
 #define PLAYER_TYPE	8
+#define FIRMWARE_VERSION	5
+#endif
 
 int connect_callback(slimproto_t *, bool, void *);
 PaDeviceIndex GetAudioDevices(PaDeviceIndex, char*, bool, bool);
@@ -84,10 +89,34 @@ void init_daemonize();
 void daemonize(char *);
 #endif
 
-#ifdef INTERACTIVE
 #define packN4(ptr, off, v) { ptr[off] = (char)(v >> 24) & 0xFF; ptr[off+1] = (v >> 16) & 0xFF; ptr[off+2] = (v >> 8) & 0xFF; ptr[off+3] = v & 0xFF; }
 #define packC(ptr, off, v) { ptr[off] = v & 0xFF; }
 #define packA4(ptr, off, v) { strncpy((char*)(&ptr[off]), v, 4); }
+
+#ifdef EMPEG
+bool empeg_powered(void);
+int empeg_getmac(char * mac_addr);
+void empeg_init(void);
+void close_lcd(void);
+long empeg_getkey(void);
+long empeg_getircode(long key);
+int empeg_idle(void);
+void empeg_poweroff(void);
+void empeg_geteq_fromfile(void);
+void empeg_puteq_tofile(void);
+int empeg_vfd_callback(slimproto_t *, const unsigned char *, int, void *);
+int empeg_vfdbrt_callback(slimproto_t *, const unsigned char *, int, void *);
+int empeg_aude_callback(slimproto_t *, const unsigned char *, int, void *);
+
+struct empeg_state_t
+{
+   long signature;
+   bool power_on;
+   char last_server[INET_ADDRSTRLEN];
+};
+#endif
+
+#ifdef INTERACTIVE
 void toggle_handler(int);
 int vfd_callback(slimproto_t *, const unsigned char *, int, void *);
 void receive_display_data(unsigned short *, int);
