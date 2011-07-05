@@ -301,6 +301,9 @@ void print_version(void) {
 #ifdef INTERACTIVE
 	fprintf(stdout, "interactive ");
 #endif
+#ifdef EMPEG
+	fprintf(stdout, "empeg ");
+#endif
 #ifdef DAEMONIZE
 	fprintf(stdout, "daemon ");
 #endif
@@ -392,6 +395,7 @@ void print_help(void) {
 "                            If using LCDd, width is detected.\n"
 #endif
 #endif
+"-F, --discovery             Discover server IP automatically.\n"
 #ifdef DAEMONIZE
 "-M, --daemonize <logfile>   Run squeezeslave as a daemon.\n"
 "                            Messages written to specified file.\n"
@@ -413,6 +417,11 @@ void print_help(void) {
 "                            is useful if the DAC used for output is slow to\n"
 "                            wake-up/lock, causing the first few samples to be\n"
 "                            dropped.\n"
+#ifdef EMPEG
+"-Q, --puteq                 Reads the empeg equalizer from the DSP and writes\n"
+"                            it to eq.dat\n"
+"-q, --geteq                 Reads the eq.dat file and configures the empeg eq\n"
+#endif
 "-R, --retry                 Causes the program to retry connecting to\n"
 "                            Squeezebox Server until it succeeds or is stopped\n"
 "                            using SIGTERM or keyboard entry.\n"

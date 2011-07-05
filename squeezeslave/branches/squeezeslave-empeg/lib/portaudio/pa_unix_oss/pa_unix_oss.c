@@ -96,68 +96,17 @@ PaError Pa_QueryDevice( const char *deviceName, internalPortAudioDevice *pad )
     }
 
     /*  Ask OSS what formats are supported by the hardware. */
-    pad->pad_Info.nativeSampleFormats = 0;
-
-    if (ioctl(tempDevHandle, SNDCTL_DSP_GETFMTS, &format) == -1)
-    {
-        ERR_RPT(("Pa_QueryDevice: could not get format info\n" ));
-        goto error;
-    }
-    if( format & AFMT_U8 )     pad->pad_Info.nativeSampleFormats |= paUInt8;
-    if( format & AFMT_S16_NE ) pad->pad_Info.nativeSampleFormats |= paInt16;
+    pad->pad_Info.nativeSampleFormats = paInt16;
 
     /* Negotiate for the maximum number of channels for this device. PLB20010927
      * Consider up to 16 as the upper number of channels.
      * Variable numChannels should contain the actual upper limit after the call.
      * Thanks to John Lazzaro and Heiko Purnhagen for suggestions.
      */
-    maxNumChannels = 0;
-    for( numChannels = 1; numChannels <= 16; numChannels++ )
-    {
-        int temp = numChannels;
-        DBUG(("Pa_QueryDevice: use SNDCTL_DSP_CHANNELS, numChannels = %d\n", numChannels ))
-        if(ioctl(tempDevHandle, SNDCTL_DSP_CHANNELS, &temp) < 0 )
-        {
-            /* ioctl() failed so bail out if we already have stereo */
-            if( numChannels > 2 ) break;
-        }
-        else
-        {
-            /* ioctl() worked but bail out if it does not support numChannels.
-             * We don't want to leave gaps in the numChannels supported.
-             */
-            if( (numChannels > 2) && (temp != numChannels) ) break;
-            DBUG(("Pa_QueryDevice: temp = %d\n", temp ))
-            if( temp > maxNumChannels ) maxNumChannels = temp; /* Save maximum. */
-        }
-    }
-
-    /* The above negotiation may fail for an old driver so try this older technique. */
-    if( maxNumChannels < 1 )
-    {
-        int stereo = 1;
-        if(ioctl(tempDevHandle, SNDCTL_DSP_STEREO, &stereo) < 0)
-        {
-            maxNumChannels = 1;
-        }
-        else
-        {
-            maxNumChannels = (stereo) ? 2 : 1;
-        }
-        DBUG(("Pa_QueryDevice: use SNDCTL_DSP_STEREO, maxNumChannels = %d\n", maxNumChannels ))
-    }
+    maxNumChannels = 2;
 
     pad->pad_Info.maxOutputChannels = maxNumChannels;
     DBUG(("Pa_QueryDevice: maxNumChannels = %d\n", maxNumChannels))
-
-    /* During channel negotiation, the last ioctl() may have failed. This can
-     * also cause sample rate negotiation to fail. Hence the following, to return
-     * to a supported number of channels. SG20011005 */
-    {
-        int temp = maxNumChannels;
-        if( temp > 2 ) temp = 2; /* use most reasonable default value */
-        ioctl(tempDevHandle, SNDCTL_DSP_CHANNELS, &temp);
-    }
 
     /* FIXME - for now, assume maxInputChannels = maxOutputChannels.
      *    Eventually do separate queries for O_WRONLY and O_RDONLY
@@ -172,36 +121,7 @@ PaError Pa_QueryDevice( const char *deviceName, internalPortAudioDevice *pad )
      * OSS often supports funky rates such as 44188 instead of 44100!
      */
     numSampleRates = 0;
-    lastRate = 0;
-    numRatesToTry = sizeof(ratesToTry)/sizeof(int);
-    for (i = 0; i < numRatesToTry; i++)
-    {
-        sampleRate = ratesToTry[i];
-
-        if (ioctl(tempDevHandle, SNDCTL_DSP_SPEED, &sampleRate) >= 0 ) /* PLB20010817 */
-        {
-            /* Use whatever rate OSS tells us. PLB20021018 */
-            if (sampleRate != lastRate)
-            {
-                DBUG(("Pa_QueryDevice: adding sample rate: %d\n", sampleRate))
-                pad->pad_SampleRates[numSampleRates] = (float)sampleRate;
-                numSampleRates++;
-                lastRate = sampleRate;
-            }
-            else
-            {
-                DBUG(("Pa_QueryDevice: dang - got sample rate %d again!\n", sampleRate))
-            }
-        }
-    }
-
-    DBUG(("Pa_QueryDevice: final numSampleRates = %d\n", numSampleRates))
-    if (numSampleRates==0)   /* HP20010922 */
-    {
-        /* Desparate attempt to keep running even though no good rates found! */
-        ERR_RPT(("Pa_QueryDevice: no supported sample rate (or SNDCTL_DSP_SPEED ioctl call failed). Force 44100 Hz\n" ));
-        pad->pad_SampleRates[numSampleRates++] = 44100;
-    }
+    pad->pad_SampleRates[numSampleRates++] = 44100;
 
     pad->pad_Info.numSampleRates = numSampleRates;
     pad->pad_Info.sampleRates = pad->pad_SampleRates; /* use pointer to embedded array */
@@ -223,56 +143,6 @@ PaError Pa_SetupDeviceFormat( int devHandle, int numChannels, int sampleRate )
     PaError result = paNoError;
     int     tmp;
 
-    /* Set format, channels, and rate in this order to keep OSS happy. */
-    /* Set data format. FIXME - handle more native formats. */
-    tmp = AFMT_S16_NE;
-    if( ioctl(devHandle,SNDCTL_DSP_SETFMT,&tmp) == -1)
-    {
-        ERR_RPT(("Pa_SetupDeviceFormat: could not SNDCTL_DSP_SETFMT\n" ));
-        return paHostError;
-    }
-    if( tmp != AFMT_S16_NE )
-    {
-        ERR_RPT(("Pa_SetupDeviceFormat: HW does not support AFMT_S16_NE\n" ));
-        return paHostError;
-    }
-
-
-    /* Set number of channels. */
-    tmp = numChannels;
-    if (ioctl(devHandle, SNDCTL_DSP_CHANNELS, &numChannels) == -1)
-    {
-        ERR_RPT(("Pa_SetupDeviceFormat: could not SNDCTL_DSP_CHANNELS\n" ));
-        return paHostError;
-    }
-    if( tmp != numChannels)
-    {
-        ERR_RPT(("Pa_SetupDeviceFormat: HW does not support %d channels\n", numChannels ));
-        return paHostError;
-    }
-
-    /* Set playing frequency. */
-    tmp = sampleRate;
-    if( ioctl(devHandle,SNDCTL_DSP_SPEED,&tmp) == -1)
-    {
-        ERR_RPT(("Pa_SetupDeviceFormat: could not SNDCTL_DSP_SPEED\n" ));
-        return paHostError;
-    }
-    else if( tmp != sampleRate )
-    {
-        int percentError = abs( (100 * (sampleRate - tmp)) / sampleRate );
-        PRINT(("Pa_SetupDeviceFormat: warning - requested sample rate = %d Hz - closest = %d\n",
-            sampleRate, tmp ));
-        /* Allow sample rate within 10% off of requested rate. PLB20021018
-        * Sometimes OSS uses a funky rate like 44188 instead of 44100.
-        */
-        if( percentError > 10 )
-        {
-            ERR_RPT(("Pa_SetupDeviceFormat: HW does not support %d Hz sample rate\n",sampleRate ));
-           return paHostError;
-        }
-    }
-    
     return result;
 }
 
@@ -321,13 +191,6 @@ void Pa_SetLatency( int devHandle, int numBuffers, int framesPerBuffer, int chan
     /* Encode info into a single int */
     tmp=(numBuffers<<16) + powerOfTwo;
 
-    if(ioctl(devHandle,SNDCTL_DSP_SETFRAGMENT,&tmp) == -1)
-    {
-        ERR_RPT(("Pa_SetLatency: could not SNDCTL_DSP_SETFRAGMENT\n" ));
-        /* Don't return an error. Best to just continue and hope for the best. */
-        ERR_RPT(("Pa_SetLatency: numBuffers = %d, framesPerBuffer = %d, powerOfTwo = %d\n",
-                 numBuffers, framesPerBuffer, powerOfTwo ));
-    }
 }
 
 /***********************************************************************/
@@ -345,15 +208,11 @@ PaTimestamp Pa_StreamTime( PortAudioStream *stream )
 
     if( pahsc->pahsc_NativeOutputBuffer )
     {
-       ioctl(pahsc->pahsc_OutputHandle, SNDCTL_DSP_GETOPTR, &info);
-       delta = (info.bytes - pahsc->pahsc_LastPosPtr);
-       return (pahsc->pahsc_LastStreamBytes + delta) / (past->past_NumOutputChannels * sizeof(short));
+       return (pahsc->pahsc_LastStreamBytes) / (past->past_NumOutputChannels * sizeof(short));
     }
     else
     {
-       ioctl(pahsc->pahsc_InputHandle, SNDCTL_DSP_GETIPTR, &info);
-       delta = (info.bytes - pahsc->pahsc_LastPosPtr);
-       return (pahsc->pahsc_LastStreamBytes + delta) / (past->past_NumInputChannels * sizeof(short));
+       return (pahsc->pahsc_LastStreamBytes) / (past->past_NumInputChannels * sizeof(short));
     }
 }
 
@@ -364,16 +223,7 @@ void Pa_UpdateStreamTime(PaHostSoundControl *pahsc)
 
   /* Update current stream time (using a double so that
      we don't wrap around like info.bytes does) */
-  if( pahsc->pahsc_NativeOutputBuffer )
-  {
-    ioctl(pahsc->pahsc_OutputHandle, SNDCTL_DSP_GETOPTR, &info);
-  }
-  else
-  {
-    ioctl(pahsc->pahsc_InputHandle, SNDCTL_DSP_GETIPTR, &info);
-  }
-  delta = (info.bytes - pahsc->pahsc_LastPosPtr);
-  pahsc->pahsc_LastStreamBytes += delta;
+  pahsc->pahsc_LastStreamBytes += 0;
   pahsc->pahsc_LastPosPtr = info.bytes;
 }
 
