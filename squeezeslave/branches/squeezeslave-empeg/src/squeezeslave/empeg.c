@@ -273,6 +273,7 @@ int empeg_idle(void)
 void empeg_poweroff(void)
 {
    empeg_writestate();
+   ioctl(power_fd, EMPEG_STATE_FORCESTORE);
    ioctl(power_fd, EMPEG_POWER_TURNOFF, 0); // turn off empeg
 }
 

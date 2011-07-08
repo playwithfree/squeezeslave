@@ -1,4 +1,5 @@
-/* PortMixer
+/*
+ * PortMixer
  * Unix OSS Implementation
  *
  * Copyright (c) 2002
@@ -135,10 +136,6 @@ PxMixer *Px_OpenMixer( void *pa_stream, int index )
    if (ioctl(info->fd, MIXER_READ(SOUND_MIXER_READ_DEVMASK),
              &devmask) == -1)
       goto bad;
-//   if (ioctl(info->fd, MIXER_READ(SOUND_MIXER_READ_RECMASK),
-//             &recmask) == -1)
-//      goto bad;
-//   outmask = devmask ^ recmask;
    outmask = devmask;
    recmask = 0;
    
