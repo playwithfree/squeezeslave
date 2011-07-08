@@ -73,14 +73,7 @@ PaError Pa_QueryDevice( const char *deviceName, internalPortAudioDevice *pad )
 {
     int result = paHostError;
     int tempDevHandle;
-    int numChannels, maxNumChannels;
-    int format;
-    int numSampleRates;
-    int sampleRate;
-    int numRatesToTry;
-    int lastRate;
-    int ratesToTry[9] = {96000, 48000, 44100, 32000, 24000, 22050, 16000, 11025, 8000};
-    int i;
+    int maxNumChannels;
 
     /* douglas:
      we have to do this querying in a slightly different order. apparently
@@ -120,17 +113,15 @@ PaError Pa_QueryDevice( const char *deviceName, internalPortAudioDevice *pad )
     /* Determine available sample rates by trying each one and seeing result.
      * OSS often supports funky rates such as 44188 instead of 44100!
      */
-    numSampleRates = 0;
-    pad->pad_SampleRates[numSampleRates++] = 44100;
+    pad->pad_SampleRates[0] = 44100;
 
-    pad->pad_Info.numSampleRates = numSampleRates;
+    pad->pad_Info.numSampleRates = 1;
     pad->pad_Info.sampleRates = pad->pad_SampleRates; /* use pointer to embedded array */
 
     pad->pad_Info.name = deviceName;
 
     result = paNoError;
 
-error:
     /* We MUST close the handle here or we won't be able to reopen it later!!!  */
     close(tempDevHandle);
 
@@ -140,10 +131,7 @@ error:
 /*******************************************************************************************/
 PaError Pa_SetupDeviceFormat( int devHandle, int numChannels, int sampleRate )
 {
-    PaError result = paNoError;
-    int     tmp;
-
-    return result;
+    return paNoError;
 }
 
 PaError Pa_SetupOutputDeviceFormat( int devHandle, int numChannels, int sampleRate )
@@ -199,9 +187,6 @@ PaTimestamp Pa_StreamTime( PortAudioStream *stream )
     internalPortAudioStream *past = (internalPortAudioStream *) stream;
     PaHostSoundControl *pahsc;
 
-    count_info    info;
-    int           delta;
-
     if( past == NULL ) return paBadStreamPtr;
     
     pahsc = (PaHostSoundControl *) past->past_DeviceData;
@@ -218,13 +203,7 @@ PaTimestamp Pa_StreamTime( PortAudioStream *stream )
 
 void Pa_UpdateStreamTime(PaHostSoundControl *pahsc)
 {
-    count_info   info;
-    int          delta;
 
-  /* Update current stream time (using a double so that
-     we don't wrap around like info.bytes does) */
-  pahsc->pahsc_LastStreamBytes += 0;
-  pahsc->pahsc_LastPosPtr = info.bytes;
 }
 
 PaError Pa_FlushStream(int devHandle)
