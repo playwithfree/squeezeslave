@@ -13,16 +13,16 @@ LDFLAGS=-s
 
 CFLAGS+=-DEMPEG
 
-INCLUDE=-Ilib/getopt -Ilib/portaudio/pa_common -Ilib/portaudio/pablio -Ilib/portmixer/px_common -Isrc -Ilib/libmad/$(OS)/include -Ilib/vorbis/$(OS)/include -Ilib/flac/$(OS)/include -I/usr/local/armtools-empeg/arm-empeg-linux/include
+INCLUDE=-Ilib/getopt -Ilib/portaudio-empeg/pa_common -Ilib/portaudio-empeg/pablio -Ilib/portmixer-empeg/px_common -Isrc -Ilib/libmad/$(OS)/include -Ilib/vorbis/$(OS)/include -Ilib/flac/$(OS)/include -I/usr/local/armtools-empeg/arm-empeg-linux/include
 
-PORTAUDIOFILES:=lib/portaudio/pa_unix_oss/pa_unix.c lib/portaudio/pa_unix_oss/pa_unix_oss.c  lib/portaudio/pa_common/pa_lib.c lib/portaudio/pa_common/pa_convert.c lib/portaudio/pablio/ringbuffer.c
+PORTAUDIOFILES:=lib/portaudio-empeg/pa_unix_oss/pa_unix.c lib/portaudio-empeg/pa_unix_oss/pa_unix_oss.c  lib/portaudio-empeg/pa_common/pa_lib.c lib/portaudio-empeg/pa_common/pa_convert.c lib/portaudio-empeg/pablio/ringbuffer.c
 
 LIBMAD=libmad-0.15.1b
 LIBOGG=libogg-1.2.0
 LIBVORBIS=tremor-r17503
 LIBFLAC=flac-1.2.1
 
-PORTMIXERFILES:=lib/portmixer/px_unix_oss/px_unix_oss.c
+PORTMIXERFILES:=lib/portmixer-empeg/px_unix_oss/px_unix_oss.c
 
 GETOPTFILES=lib/getopt/getopt.c lib/getopt/getopt1.c
 

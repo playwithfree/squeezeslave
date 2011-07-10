@@ -193,12 +193,12 @@ void empeg_init(void)
 
    ir_fd = open(IR_DEV, O_RDONLY/* | O_NDELAY*/);
 
-   state_fd = open(STATE_DEV, O_RDWR);
+   state_fd = open(STATE_DEV, O_RDWR | O_SYNC);
    read(state_fd, (void *)&empeg_state, sizeof(empeg_state));
-   if (empeg_state.signature != 0x534C494D)
+   if (empeg_state.signature != 0x4D494C53)
    {
       memset((void *)&empeg_state, 0, sizeof(empeg_state));
-      empeg_state.signature = 0x534C494D;
+      empeg_state.signature = 0x4D494C53;
    }
 
    fprintf(stderr,"Empeg hardware init complete!\n");
@@ -206,7 +206,6 @@ void empeg_init(void)
 
 void empeg_writestate(void)
 {
-   lseek(state_fd, 0, SEEK_SET);
    write(state_fd, (void *)&empeg_state, sizeof(empeg_state));
 }
 
@@ -272,9 +271,12 @@ int empeg_idle(void)
 
 void empeg_poweroff(void)
 {
+   empeg_vfdbrt(0);
    empeg_writestate();
-   ioctl(power_fd, EMPEG_STATE_FORCESTORE);
-   ioctl(power_fd, EMPEG_POWER_TURNOFF, 0); // turn off empeg
+   /* Wait for VFD/amp remote to turn off */
+   sleep(5);
+   /* Turn off empeg */
+   ioctl(power_fd, EMPEG_POWER_TURNOFF, 0);
 }
 
 struct
@@ -398,6 +400,8 @@ int empeg_vfd_callback(slimproto_t *p, const unsigned char * buf, int len , void
           }
        }
 
+       /* Delay for 5ms as stacking writes to the display too fast causes problems */
+       Pa_Sleep(5);
        ioctl(vfd_fd, EMPEG_DISPLAY_REFRESH);
    }
    return 0;
