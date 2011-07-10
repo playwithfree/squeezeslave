@@ -11,7 +11,7 @@ PATCH=patch
 CFLAGS=-DSLIMPROTO_DEBUG -DUSE_SIGNALS_FOR_RESTART -DNO_FPU -Wall -O3 -march=armv4 -mtune=strongarm1100
 LDFLAGS=-s
 
-CFLAGS+=-DEMPEG
+CFLAGS+=-DEMPEG -DRENICE
 
 INCLUDE=-Ilib/getopt -Ilib/portaudio-empeg/pa_common -Ilib/portaudio-empeg/pablio -Ilib/portmixer-empeg/px_common -Isrc -Ilib/libmad/$(OS)/include -Ilib/vorbis/$(OS)/include -Ilib/flac/$(OS)/include -I/usr/local/armtools-empeg/arm-empeg-linux/include
 

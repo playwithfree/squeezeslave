@@ -1,6 +1,6 @@
 /*
  *   SlimProtoLib Copyright (c) 2004,2006 Richard Titmuss
- *   				2008-2009 Ralph Irving
+ *   				2008-2011 Ralph Irving
  *
  *   This file is part of SlimProtoLib.
  *
@@ -23,7 +23,11 @@
 #define _SQUEEZESLAVE_H_
 
 #if defined(DAEMONIZE) && defined(__WIN32__)
-#error "DAEMONIZE not supported on WIN32 version of squeezeslave."
+#error "DAEMONIZE not supported on windows version of squeezeslave."
+#endif
+
+#if defined(EMPEG) && !defined(RENICE)
+#error "RENICE must be defined for empeg version of squeezeslave."
 #endif
 
 #include <stdio.h>
@@ -66,7 +70,7 @@
 
 #define RETRY_DEFAULT	5
 #define LINE_COUNT	2
-#define OPTLEN		64
+#define OPTLEN		96
 #define SLIMPROTOCOL_PORT	3483
 #ifdef EMPEG
 #define PLAYER_TYPE	13

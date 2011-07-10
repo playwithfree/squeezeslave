@@ -50,7 +50,7 @@ unsigned int user_latency = 0L;
 static volatile bool signal_exit_flag = false;
 static volatile bool signal_restart_flag = false;
 const char* version = "1.1";
-const int revision = 261;
+const int revision = 268;
 static int port = SLIMPROTOCOL_PORT;
 static int firmware = FIRMWARE_VERSION;
 static int player_type = PLAYER_TYPE;
@@ -67,6 +67,14 @@ bool debug_logfile = false;
 #ifdef PA_WASAPI
 bool wasapi_exclusive = true;
 #endif
+
+#ifdef RENICE
+#ifdef EMPEG /* Always enabled for empeg */
+bool renice = true;
+#else
+bool renice = false;
+#endif /* EMPEG */
+#endif /* RENICE */
 
 #ifdef INTERACTIVE
 struct lirc_config *lircconfig;
@@ -274,6 +282,9 @@ int main(int argc, char *argv[]) {
 		{"display",            no_argument,       0, 'D'},
 		{"width",              required_argument, 0, 'w'},
 #endif
+#ifdef RENICE
+		{"renice",             no_argument,       0, 'N'},
+#endif
 		{0, 0, 0, 0}
 	};
 #ifdef EMPEG
@@ -293,6 +304,9 @@ int main(int argc, char *argv[]) {
 #ifdef PA_WASAPI
 	strcat (getopt_options, "S");
 #endif
+#endif
+#ifdef RENICE
+	strcat (getopt_options, "N");
 #endif
 
 #ifdef EMPEG
@@ -447,6 +461,11 @@ int main(int argc, char *argv[]) {
 			wasapi_exclusive = false;
 			break;
 #endif
+#endif
+#ifdef RENICE
+		case 'N':
+			renice = true;
+			break;
 #endif
 		case 'n':
 			output_device_name = optarg;

@@ -334,10 +334,11 @@ static void *output_thread(void *ptr) {
                 printf("PortAudio error4: %s Could not open any audio devices.\n", Pa_GetErrorText(err) );
                 exit(-1);
         }
-
-	errno = 0;
-	nice(-5); // Increase priority
-        DEBUGF("output_thread: nice errno: %i\n", errno);
+#ifdef RENICE
+if ( renice )
+	if ( renice_thread (-5) ) /* Increase priority */
+		fprintf(stderr, "output_thread: renice failed. Got Root?\n");
+#endif
         DEBUGF("output_thread: PortAudio initialized\n");
 
 #ifndef PORTAUDIO_DEV
@@ -351,11 +352,7 @@ static void *output_thread(void *ptr) {
 				paInt16,		// output sample format
 				NULL,			// output driver info
 				44100.0,		// sample rate
-#ifdef EMPEG
 				1152,			// frames per buffer
-#else
-				256,			// frames per buffer
-#endif
 				0,			// number of buffers
 				0,			// stream flags
 				pa_callback,		// callback
