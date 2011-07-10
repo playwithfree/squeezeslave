@@ -110,6 +110,7 @@ int empeg_aude_callback(slimproto_t *, const unsigned char *, int, void *);
 
 struct empeg_state_t
 {
+   char dummy[8];
    long signature;
    bool power_on;
    char last_server[INET_ADDRSTRLEN];

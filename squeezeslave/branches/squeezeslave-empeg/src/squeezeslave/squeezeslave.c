@@ -614,6 +614,8 @@ int main(int argc, char *argv[]) {
 	empeg_init();
 	if (geteq)
 	   empeg_geteq_fromfile();
+	power_last = empeg_state.power_on;
+	empeg_state.power_on = false;
 #endif
 
 	if (slimaudio_open(&slimaudio) < 0) {
@@ -679,12 +681,16 @@ int main(int argc, char *argv[]) {
 			signal_restart_flag = true;
 			continue;
 		}
-                signal_restart_flag = false;
+		signal_restart_flag = false;
+		discover_server = false;
 #ifdef EMPEG
 		strcpy((char *)empeg_state.last_server, slimserver_address);
-
-		if (empeg_state.power_on)
-                   slimproto_ir(&slimproto, 1, 1, 0x76898F70);
+		if (power_last)
+			while (!empeg_state.power_on)
+			{
+				Pa_Sleep(100);
+				slimproto_ir(&slimproto, 1, 1, 0x76898F70);
+			}
 #endif
                 while (!signal_exit_flag && !signal_restart_flag) {
 #ifdef EMPEG
