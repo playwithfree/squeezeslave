@@ -106,9 +106,11 @@ static void *http_thread(void *ptr) {
 #ifdef SLIMPROTO_DEBUG				
 	int last_state = 0;
 #endif
-	/* Lower thread priority to give precedence to the decoder */
-	nice(5);
-
+#ifdef RENICE
+	if ( renice )
+		if ( renice_thread (5) ) /* Lower thread priority to give precedence to the decoder */
+			fprintf(stderr, "http_thread: renice failed.\n");
+#endif
 #ifdef BSD_THREAD_LOCKING
 	pthread_mutex_lock(&audio->http_mutex);
 #endif
