@@ -82,7 +82,11 @@ PaDriverInfo;
 #define MAX_TIMEOUT_MSEC   (1000)
 
 /************************************************* Definitions ********/
+#ifdef __linux__
+ #define DEVICE_NAME_BASE            "/dev/dsp"
+#else
  #define DEVICE_NAME_BASE            "/dev/audio"
+#endif
 
 #define MAX_CHARS_DEVNAME           (32)
 #define MAX_SAMPLE_RATES            (10)
