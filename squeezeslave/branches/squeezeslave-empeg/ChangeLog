@@ -1,3 +1,10 @@
+2011-07-10 21:30  ralph.irving
+
+	* [r269] ChangeLog, TODO, src/slimaudio/slimaudio_decoder_vorbis.c,
+	  src/squeezeslave/squeezeslave.c: Fixed vorbis decoder debug
+	  messages.
+	  Increased version to 269.
+
 2011-07-10 21:23  ralph.irving
 
 	* [r268] makefile.linux22-empeg, src/slimaudio/slimaudio.h,
