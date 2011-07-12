@@ -290,9 +290,8 @@ void slimaudio_output_vol_adjust(slimaudio_t *audio)
 	if ( ( audio->volume == -1.0 ) || ( audio->volume > 1.0 ) )
 		audio->volume = 1.0;
 
-	DEBUGF(" vol_adjust:%f replay_gain:%f start_replay_gain:%f",
+	DEBUGF("vol_adjust:%f replay_gain:%f start_replay_gain:%f\n",
 			audio->vol_adjust, audio->replay_gain, audio->start_replay_gain);
-	DEBUGF("\n");
 
 #ifndef PORTAUDIO_DEV
 	if (audio->px_mixer != NULL) {
@@ -676,6 +675,7 @@ static int audg_callback(slimproto_t *proto, const unsigned char *buf, int buf_l
 			msg.audg.left_gain, msg.audg.right_gain, audio->volume,
 			msg.audg.old_left_gain, msg.audg.old_right_gain);
 	VDEBUGF(" preamp:%hhu digital_volume_control:%hhu", msg.audg.preamp, msg.audg.digital_volume_control);
+	DEBUGF("\n");
 
 	audio->vol_adjust = (float) (msg.audg.left_gain) / 65536.0;
 	slimaudio_output_vol_adjust(audio);
