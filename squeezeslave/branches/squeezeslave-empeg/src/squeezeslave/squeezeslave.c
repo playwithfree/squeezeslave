@@ -673,7 +673,7 @@ int main(int argc, char *argv[]) {
 #endif
 		}
 #ifdef EMPEG
-		if (empeg_state.last_server[0] != '\0')
+		if (discover_server && empeg_state.last_server[0] != '\0')
 		{
 			strcpy(slimserver_address, (char *)empeg_state.last_server);
 			empeg_state.last_server[0] = '\0';

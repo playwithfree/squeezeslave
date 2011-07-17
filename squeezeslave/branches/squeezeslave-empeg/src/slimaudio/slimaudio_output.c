@@ -283,6 +283,8 @@ void slimaudio_output_vol_adjust(slimaudio_t *audio)
 
 #ifdef EMPEG
 	audio->volume = audio->vol_adjust + (audio->replay_gain - 1);
+	if (audio->volume < 0)
+		audio->volume = 0;
 #else
 	audio->volume = audio->vol_adjust * audio->replay_gain;
 #endif
