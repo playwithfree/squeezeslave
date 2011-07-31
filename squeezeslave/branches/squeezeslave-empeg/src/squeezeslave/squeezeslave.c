@@ -749,8 +749,7 @@ int main(int argc, char *argv[]) {
 		      slimproto_close(&slimproto);
 		      empeg_state.power_on = power_last;
 		      empeg_poweroff();
-		      exit_code = 0;
-		      goto exit;
+		      signal_restart_flag = true;
 		   }
 #endif
 #ifdef INTERACTIVE

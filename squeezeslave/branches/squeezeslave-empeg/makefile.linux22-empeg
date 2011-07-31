@@ -8,7 +8,7 @@ CP=cp
 SED=sed
 SHELL=/bin/bash
 PATCH=patch
-CFLAGS=-DSLIMPROTO_DEBUG -DUSE_SIGNALS_FOR_RESTART -DNO_FPU -Wall -O3 -march=armv4 -mtune=strongarm1100
+CFLAGS=-DUSE_SIGNALS_FOR_RESTART -DNO_FPU -Wall -O3 -march=armv4 -mtune=strongarm1100
 LDFLAGS=-s
 
 CFLAGS+=-DEMPEG -DRENICE
