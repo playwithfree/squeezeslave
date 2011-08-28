@@ -322,7 +322,10 @@ static void output_thread_stat(slimaudio_t* audio, char* code) {
 }
 
 static void *output_thread(void *ptr) {
-	int err, num_mixers, nbVolumes, volumeIdx;
+	int err;
+#ifndef PORTAUDIO_DEV
+	int num_mixers, nbVolumes, volumeIdx;
+#endif
 	struct timeval  now;
 	struct timespec timeout;
 	
