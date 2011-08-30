@@ -66,7 +66,7 @@ lib/vorbis/$(OS)/lib/libogg.a:
 
 lib/vorbis/$(OS)/lib/libvorbisidec.a: lib/vorbis/$(OS)/lib/libogg.a
 	cd lib/vorbis/$(OS)/build && ${TAR} --bzip -xf ../../../../sources/$(LIBVORBIS).tar.bz2
-	cd lib/vorbis/$(OS)/build/$(LIBVORBIS) && CC="$(CC)" CFLAGS="$(CFLAGS)" CPPFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" ./configure --enable-shared=no --host=arm-linux --with-ogg-includes=`pwd`/../../include --with-ogg-libraries=`pwd`/../../lib
+	cd lib/vorbis/$(OS)/build/$(LIBVORBIS) && CC="$(CC)" CFLAGS="$(CFLAGS)" CPPFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" OGG_CFLAGS="-I`pwd`/../../include" OGG_LIBS="`pwd`/../../lib/libogg.a" ./configure --enable-shared=no --host=arm-linux
 	cd lib/vorbis/$(OS)/build/$(LIBVORBIS) && make clean && make
 	${CP} -p lib/vorbis/$(OS)/build/$(LIBVORBIS)/.libs/libvorbisidec.a lib/vorbis/$(OS)/lib
 	${CP} -p lib/vorbis/$(OS)/build/$(LIBVORBIS)/{ivorbiscodec.h,ivorbisfile.h,config_types.h} lib/vorbis/$(OS)/include/vorbis
