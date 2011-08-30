@@ -24,7 +24,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
-#include <sys/poll.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -33,6 +32,7 @@
   #include <winsock.h>
   #define CLOSESOCKET(s) closesocket(s)
 #else
+  #include <sys/poll.h>
   #include <arpa/inet.h>
   #include <unistd.h>
   #include <sys/types.h>
@@ -250,6 +250,7 @@ int slimproto_configure_socket(int sockfd, int socktimeout)
 	return (retcode);
 }
 
+#ifndef __WIN32__
 #define SLIMPROTO_DISCOVERY "eIPAD\0NAME\0JSON"
 
 int slimproto_discover(char * server_addr, int server_addr_len, int port)
@@ -311,6 +312,7 @@ int slimproto_discover(char * server_addr, int server_addr_len, int port)
 	close(sockfd);
 	return -1;  /* Server not found */
 }
+#endif /* __WIN32__ */
 
 int slimproto_connect(slimproto_t *p, const char *server_addr, int port) {
 	struct hostent *server;

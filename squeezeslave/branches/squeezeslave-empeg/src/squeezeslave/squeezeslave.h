@@ -48,7 +48,7 @@
 #include <sys/types.h>
 #ifdef __WIN32__
 #include <sys/fcntl.h>
-#include <winsock.h>
+#include <winsock2.h>
 #define MSG_DONTWAIT 0
 #else
 #include <sys/socket.h>
@@ -63,6 +63,10 @@
 #ifndef __WIN32__
 #include <netinet/tcp.h> 
 #endif
+#endif
+
+#ifdef __WIN32__
+#include <ws2tcpip.h>
 #endif
 
 #include "slimproto/slimproto.h"

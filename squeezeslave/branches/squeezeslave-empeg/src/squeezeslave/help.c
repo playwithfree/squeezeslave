@@ -499,7 +499,9 @@ void print_help(void) {
 "                            If using LCDd, width is detected.\n"
 #endif
 #endif
+#ifndef __WIN32__
 "-F, --discovery             Discover server IP automatically.\n"
+#endif
 #ifdef DAEMONIZE
 "-M, --daemonize <logfile>   Run squeezeslave as a daemon.\n"
 "                            Messages written to specified file.\n"
