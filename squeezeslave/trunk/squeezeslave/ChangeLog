@@ -1,3 +1,17 @@
+2011-08-10 10:54  ralph.irving
+
+	* [r273] contrib/makefile.freebsd, src/squeezeslave/squeezeslave.c:
+	  Updated makefile.freebsd for 8.2-STABLE. Thanks to Torfinn
+	  Ingolfsen for the updated makefile.
+	  Increased version to 273 for upcoming OpenWrt/MIPS packages.
+
+2011-06-24 12:45  paddockd
+
+	* [r262] ChangeLog, TODO, src/slimaudio/slimaudio_decoder_vorbis.c,
+	  src/squeezeslave/squeezeslave.c: Fixed vorbis decoder debug
+	  messages.
+	  Increased version to 262.
+
 2011-06-06 14:42  paddockd
 
 	* [r261] ChangeLog, src/squeezeslave/squeezeslave.c: Increased
@@ -1242,7 +1256,7 @@
 	* [r131] src/slimaudio/slimaudio.c, src/slimaudio/slimaudio_http.c,
 	  src/squeezeslave/squeezeslave.c: Added STMc, STMh, STMl and STMe
 	  slimprotocol status messages.
-	  Increased firmware version to 2.
+	  Incrased firmware version to 3.
 	  Increased version to 131.
 
 2010-03-11 12:59  paddockd
