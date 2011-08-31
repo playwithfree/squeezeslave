@@ -1,3 +1,10 @@
+2011-08-31 17:45  ralph.irving
+
+	* [r280] ChangeLog, src/slimaudio/slimaudio_http.c,
+	  src/squeezeslave/squeezeslave.c: Fixed SUNPRO_C unreachable code
+	  error in slimaudio_http.c
+	  Increased revision to 280.
+
 2011-08-31 12:30  ralph.irving
 
 	* [r278] ., ChangeLog, TODO, lib/portaudio-empeg,
