@@ -1,3 +1,10 @@
+2011-08-31 17:57  ralph.irving
+
+	* [r281] ChangeLog, src/slimproto/slimproto.c,
+	  src/squeezeslave/squeezeslave.c: Moved server discovery messages
+	  into DEBUGF logging framework.
+	  Increased revision to 281.
+
 2011-08-31 17:45  ralph.irving
 
 	* [r280] ChangeLog, src/slimaudio/slimaudio_http.c,
