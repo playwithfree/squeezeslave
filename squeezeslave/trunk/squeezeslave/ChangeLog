@@ -1,3 +1,63 @@
+2011-10-19 10:55  ralph.irving
+
+	* [r287] contrib/makefile.freebsd-sparc64,
+	  contrib/makefile.linux24-ffmpeg-alsa-display,
+	  contrib/makefile.linux24-nofpu-alsa-display,
+	  contrib/makefile.linux26-armel-alsa,
+	  contrib/makefile.linux26-armel-nofpu-alsa-display,
+	  contrib/makefile.linux26-armel-nofpu-oss-display,
+	  contrib/makefile.linux26-armel-oss,
+	  contrib/makefile.linux26-ffmpeg-alsa-display,
+	  contrib/makefile.linux26-mipsel-nofpu-alsa,
+	  contrib/makefile.linux26-mipsel-nofpu-oss,
+	  contrib/makefile.linux26-mipsel-oss,
+	  contrib/makefile.linux26-nofpu-alsa-display,
+	  contrib/makefile.linux26-ppc-alsa-display,
+	  contrib/makefile.mingw32-ffmpeg-display,
+	  contrib/makefile.mingw32-pa-display,
+	  makefile.linux24-alsa-display, makefile.linux24-display,
+	  makefile.linux26-alsa-display, makefile.linux26-display,
+	  makefile.linux26-i64-alsa-display, makefile.mingw32-asio-display,
+	  makefile.mingw32-display, makefile.mingw32-wasapi-display,
+	  makefile.osx-i64-display, makefile.osx-intel-display,
+	  makefile.osx-ppc-display, makefile.sol10-intel-display,
+	  makefile.sol10-sparc64-display, makefile.sol9-sparc-display,
+	  src/squeezeslave/squeezeslave.c: Disabled building C++ library
+	  and xmms plugin for FLAC.
+	  Added windows portaudio v18.1 makefile.
+	  Increased revision to 287.
+
+2011-10-10 17:49  ralph.irving
+
+	* [r286] src/slimaudio/slimaudio.c, src/slimaudio/slimaudio.h,
+	  src/slimaudio/slimaudio_output.c, src/squeezeslave/help.c,
+	  src/squeezeslave/squeezeslave.c: Zones option is now enabled by
+	  adding -DZONES to the makefile CFLAGS variable.
+	  Added zones compile time display option.
+	  Added zones help information to -h.
+	  Increased revision to 286.
+
+2011-10-10 17:48  ralph.irving
+
+	* [r285] src/slimaudio/slimaudio.c, src/slimaudio/slimaudio.h,
+	  src/slimaudio/slimaudio_output.c,
+	  src/squeezeslave/squeezeslave.c: Applied odedn's multizone
+	  support patch.
+	  Increased revision to 285.
+
+2011-10-10 17:47  ralph.irving
+
+	* [r284] README, src/slimaudio/slimaudio_decoder.c,
+	  src/squeezeslave/squeezeslave.c: Fixed SUNPROC unreachable code
+	  warning in decoder thread.
+	  Increased revision to 284.
+
+2011-09-19 18:43  ralph.irving
+
+	* [r283] ChangeLog, scripts/buildall-osx, scripts/buildall-win,
+	  scripts/buildall-win32: Build script updates.
+	  Renamed win32 build script to win.
+
 2011-09-19 18:16  ralph.irving
 
 	* [r282] ChangeLog, wiki/SupportThread.wiki: Capture support thread
