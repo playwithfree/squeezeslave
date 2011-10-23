@@ -1,3 +1,15 @@
+2011-10-23 11:34  ralph.irving
+
+	* [r295] ChangeLog, deprecated/makefile.mingw32-asio-display,
+	  deprecated/makefile.mingw32-wasapi-display,
+	  makefile.windows-display, scripts/buildall-win,
+	  src/slimaudio/slimaudio_output.c, src/squeezeslave/help.c,
+	  src/squeezeslave/squeezeslave.c: Renamed PA_WASAPI define to
+	  PADEV_WASAPI.
+	  Renamed PA_ASIO define to PADEV_ASIO.
+	  Updated windows build script.
+	  Increased revision to 295.
+
 2011-10-23 11:30  ralph.irving
 
 	* [r294] ChangeLog, deprecated/makefile.mingw32-asio-display,
