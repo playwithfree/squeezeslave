@@ -1,3 +1,18 @@
+2011-10-23 12:17  ralph.irving
+
+	* [r298] patches/build-7zip-localtime.patch: Add missed 7zip patch
+	  from r297.
+
+2011-10-23 11:40  ralph.irving
+
+	* [r297] ChangeLog, contrib/makefile.mingw32-pa-display,
+	  deprecated/makefile.mingw32-asio-display,
+	  deprecated/makefile.mingw32-display,
+	  deprecated/makefile.mingw32-wasapi-display,
+	  makefile.windows-display, src/squeezeslave/squeezeslave.c: Fixed
+	  p7zip localtime undeclared windows build error.
+	  Increased revision to 297.
+
 2011-10-23 11:37  ralph.irving
 
 	* [r296] ChangeLog, scripts/buildall-win,
