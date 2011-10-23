@@ -1,3 +1,13 @@
+2011-10-23 11:24  ralph.irving
+
+	* [r293] ChangeLog, TODO, makefile.windows-display,
+	  src/slimaudio/slimaudio_output.c, src/squeezeslave/help.c,
+	  src/squeezeslave/squeezeslave.c: Added All-In-One
+	  ASIO-DirectX-WASAPI windows makefile, no more separate windows
+	  binaries for each audio driver type.
+	  Reworked compile time options display for asio and wasapi.
+	  Increased revision to 293.
+
 2011-10-20 13:40  ralph.irving
 
 	* [r292] ChangeLog, contrib/makefile.freebsd,
