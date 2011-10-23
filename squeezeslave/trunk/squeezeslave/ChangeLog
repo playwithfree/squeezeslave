@@ -1,3 +1,13 @@
+2011-10-23 11:30  ralph.irving
+
+	* [r294] ChangeLog, deprecated/makefile.mingw32-asio-display,
+	  deprecated/makefile.mingw32-display,
+	  deprecated/makefile.mingw32-wasapi-display,
+	  makefile.mingw32-asio-display, makefile.mingw32-display,
+	  makefile.mingw32-wasapi-display, scripts/buildall-win: Moved
+	  deprecated mingw32 makefiles.
+	  Updated windows build script.
+
 2011-10-23 11:24  ralph.irving
 
 	* [r293] ChangeLog, TODO, makefile.windows-display,
