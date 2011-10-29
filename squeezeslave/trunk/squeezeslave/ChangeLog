@@ -1,3 +1,23 @@
+2011-10-24 22:07  ralph.irving
+
+	* [r300] makefile.osx-intel-display, makefile.osx-ppc-display,
+	  patches/build-portaudio-force-osx10.4u-sdk-i386.patch,
+	  patches/build-portaudio-force-osx10.4u-sdk-ppc.patch,
+	  scripts/buildall-osx, src/squeezeslave/squeezeslave.c: Updated
+	  OSX i386 and ppc makefiles for use with Xcode 3.2.6 on 10.6.
+	  Updated OSX build script to create a universal binary with all 3
+	  architectures.
+	  Xcode 2.4.1 no longer supported for i386 and ppc.
+	  Fixed OSX build script.
+	  Increased revision to 300.
+
+2011-10-23 14:33  ralph.irving
+
+	* [r299] ChangeLog, TODO, src/squeezeslave/help.c,
+	  src/squeezeslave/squeezeslave.c: Updated -S/--shared help
+	  information.
+	  Increased revision to 299.
+
 2011-10-23 12:17  ralph.irving
 
 	* [r298] patches/build-7zip-localtime.patch: Add missed 7zip patch
