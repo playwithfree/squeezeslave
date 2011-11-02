@@ -1,3 +1,14 @@
+2011-10-29 12:57  ralph.irving
+
+	* [r301] ChangeLog, lib/getopt/getopt.c,
+	  lib/portaudio/pa_unix_oss/pa_unix.c,
+	  lib/portaudio/pa_unix_oss/pa_unix_solaris.c,
+	  src/slimaudio/slimaudio_http.c, src/squeezeslave/daemonize.c,
+	  src/squeezeslave/squeezeslave.c: Fixed Solaris Sun Studio
+	  compiler warnings.
+	  Fixed stdout/stderr freopen error checking.
+	  Increased revision to 301.
+
 2011-10-24 22:07  ralph.irving
 
 	* [r300] makefile.osx-intel-display, makefile.osx-ppc-display,
