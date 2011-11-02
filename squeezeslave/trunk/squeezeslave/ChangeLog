@@ -1,3 +1,8 @@
+2011-11-02 11:58  ralph.irving
+
+	* [r302] ChangeLog, scripts/buildall-lnx26-armel: Updated
+	  squeezeplug build script to handle local/google repositories.
+
 2011-10-29 12:57  ralph.irving
 
 	* [r301] ChangeLog, lib/getopt/getopt.c,
