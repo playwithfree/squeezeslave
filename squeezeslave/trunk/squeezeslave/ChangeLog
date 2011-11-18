@@ -1,3 +1,8 @@
+2011-11-18 12:21  ralph.irving
+
+	* [r306] ChangeLog, scripts/buildall-lnx26: Updated linux 2.6 build
+	  script to handle local/remote repositories.
+
 2011-11-02 12:08  ralph.irving
 
 	* [r305] sources/libogg-1.2.0.tar.bz2,
