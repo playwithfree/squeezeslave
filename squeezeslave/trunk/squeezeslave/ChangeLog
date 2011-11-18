@@ -1,3 +1,13 @@
+2011-11-18 12:29  ralph.irving
+
+	* [r308] ChangeLog, TODO, src/squeezeslave/help.c,
+	  src/squeezeslave/interactive.c, src/squeezeslave/squeezeslave.c:
+	  Updated -l/--lcd LCDd (lcdproc) to use Priorities keywords
+	  instead of values.
+	  Added -C/--lcdc option to revert Priorities to use values. Use if
+	  still running lcdproc < 0.5.4.
+	  Increased revision to 308.
+
 2011-11-18 12:25  ralph.irving
 
 	* [r307] ChangeLog, contrib/makefile.linux24-ffmpeg-alsa-display,
