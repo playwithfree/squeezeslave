@@ -1,3 +1,12 @@
+2011-11-18 12:25  ralph.irving
+
+	* [r307] ChangeLog, contrib/makefile.linux24-ffmpeg-alsa-display,
+	  src/slimaudio/slimaudio_decoder.c,
+	  src/slimaudio/slimaudio_decoder_wma.c,
+	  src/squeezeslave/squeezeslave.c: Removed depreciated function
+	  calls from ffmpeg wma decoder.
+	  Increased revision to 307.
+
 2011-11-18 12:21  ralph.irving
 
 	* [r306] ChangeLog, scripts/buildall-lnx26: Updated linux 2.6 build
