@@ -1,3 +1,9 @@
+2011-11-18 12:35  ralph.irving
+
+	* [r309] ChangeLog, src/squeezeslave/squeezeslave.c: Fixed FQDN
+	  truncation at 16 characters. MAX length is now 256 characters.
+	  Increased revision to 309.
+
 2011-11-18 12:29  ralph.irving
 
 	* [r308] ChangeLog, TODO, src/squeezeslave/help.c,
