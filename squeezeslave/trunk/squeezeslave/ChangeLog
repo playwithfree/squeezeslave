@@ -1,3 +1,13 @@
+2011-12-24 12:08  ralph.irving
+
+	* [r310] ChangeLog, tests/find_servers.c: Added slimproto_discover
+	  test harness.
+	  Fixed test slimproto_discover failure when local server running.
+	  Fixed test slimproto_discover OSX abort traps.
+	  Added JSON port retrieval to test slimproto_discover.
+	  Cleaned up test slimproto_discover malloc code.
+	  Applied winsock fix to testbed find_servers.c.
+
 2011-11-18 12:35  ralph.irving
 
 	* [r309] ChangeLog, src/squeezeslave/squeezeslave.c: Fixed FQDN
