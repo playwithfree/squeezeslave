@@ -1,3 +1,20 @@
+2011-12-24 12:39  ralph.irving
+
+	* [r311] ChangeLog, src/slimproto/slimproto.c,
+	  src/slimproto/slimproto.h, src/squeezeslave/help.c,
+	  src/squeezeslave/squeezeslave.c, src/squeezeslave/squeezeslave.h:
+	  Fixed slimproto_discover failure when a local SBS is running.
+	  Thanks to gharris999 for finding this one and suggesting a fix.
+	  Updated slimproto_discover to support findservers option,
+	  retrieve JSON port as well as the IP address.
+	  Added -I/--findservers option to list servers found via UDP
+	  discovery.
+	  Fixed slimproto_discover for windows, winsock not initialized as
+	  slimproto_init not called.
+	  Increased firmware version to 7.
+	  Increased version to 1.2.
+	  Increased revision to 311.
+
 2011-12-24 12:08  ralph.irving
 
 	* [r310] ChangeLog, tests/find_servers.c: Added slimproto_discover
