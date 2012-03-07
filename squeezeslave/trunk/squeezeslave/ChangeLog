@@ -1,3 +1,13 @@
+2012-02-17 21:07  ralph.irving
+
+	* [r316] src/squeezeslave/help.c, src/squeezeslave/squeezeslave.c:
+	  Updated year in copyright notice.
+	  Increased revision to 316.
+
+2012-02-17 15:00  ralph.irving
+
+	* [r315] ChangeLog: Updated changelog.
+
 2012-02-15 12:41  ralph.irving
 
 	* [r313] ChangeLog, scripts/buildall-lnx24, scripts/createpaexp:
