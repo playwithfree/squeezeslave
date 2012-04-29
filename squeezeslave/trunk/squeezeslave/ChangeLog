@@ -1,3 +1,11 @@
+2012-03-07 13:01  ralph.irving
+
+	* [r319] ChangeLog, src/slimaudio/slimaudio_decoder_aac.c,
+	  src/squeezeslave/squeezeslave.c: Removed depreciated function
+	  calls from ffmpeg aac decoder. Thanks to Tim Harder for the
+	  patch.
+	  Increased revision to 319.
+
 2012-03-07 12:44  ralph.irving
 
 	* [r318] ChangeLog,
