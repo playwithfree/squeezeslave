@@ -1,3 +1,10 @@
+2012-05-26 19:43  ralph.irving
+
+	* [r333] ChangeLog, makefile.windows-display,
+	  src/squeezeslave/squeezeslave.c: Moved windows build to fixed
+	  point tremor vorbis decoder.
+	  Increased revision to 333.
+
 2012-05-26 19:42  ralph.irving
 
 	* [r332] ChangeLog, contrib/makefile.linux24-nofpu-alsa-display,
