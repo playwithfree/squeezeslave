@@ -1,3 +1,9 @@
+2012-05-26 19:29  ralph.irving
+
+	* [r329] ChangeLog, patches/build-portaudio-alsa-invalidsr.patch,
+	  src/squeezeslave/squeezeslave.c: Updated patches.
+	  Increased revision to 329.
+
 2012-05-26 19:27  ralph.irving
 
 	* [r328] ChangeLog, config/custom-convert.inguzdsp,
