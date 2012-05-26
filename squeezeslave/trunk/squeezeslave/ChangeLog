@@ -1,3 +1,27 @@
+2012-05-26 19:37  ralph.irving
+
+	* [r331] ChangeLog, contrib/makefile.freebsd-i386,
+	  contrib/makefile.freebsd-sparc64,
+	  contrib/makefile.linux24-ffmpeg-alsa-display,
+	  contrib/makefile.linux24-nofpu-alsa-display,
+	  contrib/makefile.linux26-armel-alsa,
+	  contrib/makefile.linux26-ffmpeg-alsa-display,
+	  contrib/makefile.linux26-mipsel-nofpu-alsa,
+	  contrib/makefile.linux26-nofpu-alsa-display,
+	  contrib/makefile.linux26-ppc-alsa-display,
+	  makefile.linux24-alsa-display, makefile.linux26-alsa-display,
+	  makefile.linux26-armel-alsa-display,
+	  makefile.linux26-i64-alsa-display, makefile.osx-i64-display,
+	  makefile.osx-intel-display, makefile.osx-ppc-display,
+	  makefile.windows-display, sources/portaudio-r1834.tar.gz,
+	  src/squeezeslave/squeezeslave.c: Updated libportaudio to r1834 to
+	  fix invalid sample rate error on device open for inexactly
+	  clocked sound cards with up to a 1% deviation from 44100Hz sample
+	  rate.
+	  Removed patch to allow portaudio to compile with older ALSA
+	  versions as r1834 includes the fix.
+	  Increased revision to 331.
+
 2012-05-26 19:33  ralph.irving
 
 	* [r330] ChangeLog, contrib/makefile.freebsd-i386,
