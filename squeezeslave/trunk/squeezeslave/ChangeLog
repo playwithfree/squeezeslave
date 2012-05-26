@@ -1,3 +1,11 @@
+2012-04-29 12:06  ralph.irving
+
+	* [r325] ChangeLog, makefile.osx-i64-display,
+	  makefile.osx-intel-display, makefile.osx-ppc-display,
+	  src/squeezeslave/squeezeslave.c: Upgraded libportaudio to r1826
+	  for OSX.
+	  Increased revision to 325.
+
 2012-04-29 12:05  ralph.irving
 
 	* [r324] ChangeLog, src/squeezeslave/help.c,
