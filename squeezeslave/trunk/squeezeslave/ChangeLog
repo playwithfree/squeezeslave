@@ -1,3 +1,12 @@
+2012-05-26 19:22  ralph.irving
+
+	* [r326] ChangeLog, makefile.linux24-i586-display,
+	  scripts/buildall-lnx24mmx, src/squeezeslave/squeezeslave.c:
+	  Updated i586 makefile to use tremor fixed point ogg decoder by
+	  default.
+	  Updated i586 build script.
+	  Increased revision to 326.
+
 2012-04-29 12:06  ralph.irving
 
 	* [r325] ChangeLog, makefile.osx-i64-display,
