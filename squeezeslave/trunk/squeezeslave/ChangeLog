@@ -1,3 +1,13 @@
+2012-05-26 19:27  ralph.irving
+
+	* [r328] ChangeLog, config/custom-convert.inguzdsp,
+	  patches/build-libmad-mips-remove-constraint.patch,
+	  patches/build-portaudio-alsa-invalidsr.patch,
+	  patches/build-portaudio-asio-gcc4.patch,
+	  src/squeezeslave/squeezeslave.c: Added outstanding patch and
+	  config files.
+	  Increased revision to 328.
+
 2012-05-26 19:25  ralph.irving
 
 	* [r327] ChangeLog, makefile.linux24-i586-display,
