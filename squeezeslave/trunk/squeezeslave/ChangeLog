@@ -1,3 +1,11 @@
+2012-05-26 19:50  ralph.irving
+
+	* [r337] ChangeLog, contrib/makefile.osx-lion-i64-display,
+	  src/slimaudio/slimaudio_output.c,
+	  src/squeezeslave/squeezeslave.c: Added OSX 10.7 64bit makefile to
+	  contrib.
+	  Increased revision to 337.
+
 2012-05-26 19:48  ralph.irving
 
 	* [r336] ChangeLog, contrib/makefile.linux24-gcc43-alsa-display,
