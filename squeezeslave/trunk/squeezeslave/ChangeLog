@@ -1,3 +1,9 @@
+2012-06-08 11:22  ralph.irving
+
+	* [r339] ChangeLog, src/squeezeslave/squeezeslave.c: Moved
+	  variables to top of main() for gcc 2.95.3 support.
+	  Increased revision to 339.
+
 2012-06-08 11:21  ralph.irving
 
 	* [r338] ChangeLog, lib/portaudio-empeg/pa_common/pa_convert.c,
