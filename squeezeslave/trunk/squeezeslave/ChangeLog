@@ -1,3 +1,10 @@
+2012-06-10 18:02  ralph.irving
+
+	* [r344] ChangeLog, contrib/makefile.sol-gcc-sparc-display,
+	  patches/bitrate-limit-wma.patch: Added generic solaris makefile
+	  for gcc to contrib.
+	  Added server patch to enable bitrate limiting for wma.
+
 2012-06-10 18:00  ralph.irving
 
 	* [r343] ChangeLog, makefile.sol10-intel-display,
