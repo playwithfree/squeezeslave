@@ -1,3 +1,10 @@
+2012-06-08 11:28  ralph.irving
+
+	* [r341] ChangeLog, TODO, src/slimproto/slimproto.c,
+	  src/squeezeslave/squeezeslave.c: Fixed unclosed comment from the
+	  removal of all C++ // style comments.
+	  Increased revision to 341.
+
 2012-06-08 11:24  ralph.irving
 
 	* [r340] ChangeLog, lib/libmad/s10intel/include/stdbool.h,
