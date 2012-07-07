@@ -1,3 +1,10 @@
+2012-07-07 19:03  ralph.irving
+
+	* [r357] ChangeLog, lib/portaudio/pa_unix_oss/pa_unix.c,
+	  src/squeezeslave/squeezeslave.c: Applied Linux Duplex bug fix
+	  from Alan Horstmann 4.6.07 to portaudio v18.
+	  Increased revision to 357.
+
 2012-07-07 19:00  ralph.irving
 
 	* [r356] ChangeLog, src/slimaudio/slimaudio.c,
