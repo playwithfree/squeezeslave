@@ -1,3 +1,10 @@
+2012-07-07 19:15  ralph.irving
+
+	* [r363] ChangeLog, src/slimaudio/slimaudio_output.c,
+	  src/squeezeslave/squeezeslave.c: Portmixer debug messages
+	  cleanup.
+	  Increased revision to 363.
+
 2012-07-07 19:13  ralph.irving
 
 	* [r362] ChangeLog, src/slimaudio/slimaudio.h,
