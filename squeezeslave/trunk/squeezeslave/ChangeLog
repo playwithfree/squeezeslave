@@ -1,3 +1,10 @@
+2012-07-07 18:43  ralph.irving
+
+	* [r351] ChangeLog, src/slimaudio/slimaudio_http.c,
+	  src/squeezeslave/squeezeslave.c: Added -T/--threshold_override
+	  undocumented option to defeat the workaround.
+	  Increased revision to 351.
+
 2012-06-20 17:54  ralph.irving
 
 	* [r350] ChangeLog, src/slimaudio/slimaudio_decoder_vorbis.c,
