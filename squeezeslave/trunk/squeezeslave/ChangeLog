@@ -1,3 +1,11 @@
+2012-07-07 19:00  ralph.irving
+
+	* [r356] ChangeLog, src/slimaudio/slimaudio.c,
+	  src/slimaudio/slimaudio_output.c,
+	  src/squeezeslave/squeezeslave.c: Added stream active check to
+	  output STOP case for portaudio v18.
+	  Increased revision to 356.
+
 2012-07-07 18:58  ralph.irving
 
 	* [r355] ChangeLog, TODO, src/slimaudio/slimaudio.h,
