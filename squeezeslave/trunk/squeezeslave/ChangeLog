@@ -1,3 +1,10 @@
+2012-07-07 19:05  ralph.irving
+
+	* [r358] ChangeLog, lib/portaudio/pa_unix_oss/pa_unix_solaris.c,
+	  src/squeezeslave/squeezeslave.c: Pause and flush only required
+	  when changing record parameters in Solaris.
+	  Increased revision to 358.
+
 2012-07-07 19:03  ralph.irving
 
 	* [r357] ChangeLog, lib/portaudio/pa_unix_oss/pa_unix.c,
