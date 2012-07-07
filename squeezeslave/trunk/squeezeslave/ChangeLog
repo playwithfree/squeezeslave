@@ -1,3 +1,14 @@
+2012-07-07 18:45  ralph.irving
+
+	* [r352] ChangeLog, TODO, src/slimaudio/slimaudio_http.c,
+	  src/slimaudio/slimaudio_output.c,
+	  src/squeezeslave/squeezeslave.c: Added our own output_threshold
+	  of 1.2 seconds if the server sends 0 in strm message.
+	  Added buffering to PLAY state in slimaudio_output.c using
+	  output_threshold. Fixes dropouts when playing the first track in
+	  a playlist on Solaris.
+	  Increased revision to 352.
+
 2012-07-07 18:43  ralph.irving
 
 	* [r351] ChangeLog, src/slimaudio/slimaudio_http.c,
