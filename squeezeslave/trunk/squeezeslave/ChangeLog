@@ -1,3 +1,9 @@
+2012-07-07 19:31  ralph.irving
+
+	* [r365] ChangeLog, TODO, src/squeezeslave/squeezeslave.c,
+	  src/squeezeslave/squeezeslave.h: Increased firmware version to 9.
+	  Increased revision to 365.
+
 2012-07-07 19:16  ralph.irving
 
 	* [r364] ChangeLog, src/slimaudio/slimaudio_output.c,
