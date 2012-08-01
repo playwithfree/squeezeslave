@@ -1,3 +1,8 @@
+2012-08-01 12:32  ralph.irving
+
+	* [r368] ChangeLog, lib/portaudio/Makefile.solaris: Added install
+	  section to portaudio v18.1 solaris makefile.
+
 2012-07-21 18:41  ralph.irving
 
 	* [r367] ChangeLog, contrib/makefile.linux26-armhf-alsa-display,
