@@ -1,3 +1,10 @@
+2012-08-02 00:53  ralph.irving
+
+	* [r370] ChangeLog, lib/libportaudio/s10intel,
+	  lib/libportaudio/s10intel/build,
+	  lib/libportaudio/s10intel/include, lib/libportaudio/s10intel/lib:
+	  Add missing OpenIndiana build directories.
+
 2012-08-01 12:38  ralph.irving
 
 	* [r369] ChangeLog, contrib/makefile.oi-gcc-intel-display,
