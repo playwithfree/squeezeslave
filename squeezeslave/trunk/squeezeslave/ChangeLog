@@ -1,3 +1,8 @@
+2012-09-01 18:20  ralph.irving
+
+	* [r375] ChangeLog, sources/portaudio-r1857.tar.gz: Added r1857 of
+	  the portaudio support library.
+
 2012-09-01 18:17  ralph.irving
 
 	* [r374] ChangeLog, contrib/makefile.oi-gcc-intel-v18-display,
