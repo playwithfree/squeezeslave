@@ -1,3 +1,10 @@
+2012-09-01 18:17  ralph.irving
+
+	* [r374] ChangeLog, contrib/makefile.oi-gcc-intel-v18-display,
+	  src/squeezeslave/squeezeslave.c: Added OpenIndian intel portaudio
+	  v18 makefile to contrib.
+	  Increased revision to 374.
+
 2012-09-01 18:15  ralph.irving
 
 	* [r373] ChangeLog, lib/portaudio/Makefile.openindiana,
