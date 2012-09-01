@@ -1,3 +1,19 @@
+2012-09-01 18:11  ralph.irving
+
+	* [r372] lib/portaudio/pa_unix_oss/pa_unix.c,
+	  lib/portaudio/pa_unix_oss/pa_unix_solaris.c: Changed
+	  Pa_AudioThreadProc behaviour for OSS/Solaris to playout current
+	  buffer if the callback returns non zero, instead of breaking out
+	  of the loop.
+	  Allowing a smooth transistion when closing/opening the device for
+	  a sample rate change.
+
+2012-09-01 18:10  ralph.irving
+
+	* [r371] ChangeLog, lib/portaudio/pa_unix_oss/pa_unix_solaris.c:
+	  Revert r358 - Pause and flush only required when changing record
+	  parameters in Solaris.
+
 2012-08-02 00:53  ralph.irving
 
 	* [r370] ChangeLog, lib/libportaudio/s10intel,
