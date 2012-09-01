@@ -1,3 +1,10 @@
+2012-09-01 18:15  ralph.irving
+
+	* [r373] ChangeLog, lib/portaudio/Makefile.openindiana,
+	  lib/portaudio/pa_unix_oss/pa_unix.h,
+	  lib/portaudio/pa_unix_oss/pa_unix_oss.c: Added OSS support to
+	  portaudio v18 for OpenIndiana using HAVE_SYS_SOUNDCARD_H define.
+
 2012-09-01 18:11  ralph.irving
 
 	* [r372] lib/portaudio/pa_unix_oss/pa_unix.c,
