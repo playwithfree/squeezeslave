@@ -1,3 +1,10 @@
+2012-09-01 18:22  ralph.irving
+
+	* [r376] ChangeLog, src/squeezeslave/squeezeslave.c,
+	  src/squeezeslave/squeezeslave.h: Increased PA_FRAMES_PER_BUFFER
+	  size.
+	  Increased revision to 376.
+
 2012-09-01 18:20  ralph.irving
 
 	* [r375] ChangeLog, sources/portaudio-r1857.tar.gz: Added r1857 of
