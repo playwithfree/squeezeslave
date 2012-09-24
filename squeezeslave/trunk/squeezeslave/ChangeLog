@@ -1,3 +1,17 @@
+2012-09-17 21:02  ralph.irving
+
+	* [r378] src/squeezeslave/help.c, src/squeezeslave/squeezeslave.c:
+	  Reverted default volume mixer to software for all platforms
+	  except EMPEG.
+	  Increased revision to 378.
+
+2012-09-17 21:00  ralph.irving
+
+	* [r377] ChangeLog, contrib/makefile.oi-gcc-intel-v18-display,
+	  makefile.oi-intel-oss-display, makefile.oi-intel-sada-display:
+	  Added new OpenIndiana portaudio v18 makefiles.
+	  Deleted old OpenIndiana v18 makefile.
+
 2012-09-01 18:22  ralph.irving
 
 	* [r376] ChangeLog, src/squeezeslave/squeezeslave.c,
