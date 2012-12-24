@@ -1,3 +1,38 @@
+2012-11-03 18:24  ralph.irving
+
+	* [r381] ChangeLog, patches/wma-aac-SqueezeSlave-pm.patch,
+	  src/slimaudio/slimaudio_decoder_aac.c,
+	  src/slimaudio/slimaudio_decoder_wma.c,
+	  src/squeezeslave/squeezeslave.c: Regarding the aac/wma support, i
+	  was getting segfaults which were
+	  caused by how the AVIOCtx was getting discarded by ffmpeg and
+	  wound up
+	  null in later functions.
+	  After spending a while looking into it, i found (part of) the
+	  reason:
+	  https://lists.ffmpeg.org/pipermail/ffmpeg-cvslog/2011-July/038685.html
+	  the fix is use avformat_open_input instead of
+	  av_open_input_stream,
+	  and to preallocate pFormatCtx then set pFormatCtx->pb to AVIOCtx.
+	  also, for aac streaming (eg. shoutcast), i think it starts
+	  midframe
+	  and is isn't decodable, so it exits saying no audio to decode. my
+	  fix
+	  here was to remove the break and let it decode until it finds
+	  complete
+	  data. i think a similar thing could be done for the wma decode,
+	  but i
+	  haven't tested streams there. maybe it would be good to keep
+	  track of
+	  the number of 0 length avpkt encountered then break if a
+	  threshold is
+	  reached.
+	  Here are the patches. they seem to work okay with ffmpeg 0.8.12
+	  and 0.10.6.
+	  thanks,
+	  -matt merhar
+	  Increased revision to 381.
+
 2012-10-21 12:10  ralph.irving
 
 	* [r380] ChangeLog, makefile.osx-i64-display,
