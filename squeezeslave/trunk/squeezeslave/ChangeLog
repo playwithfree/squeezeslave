@@ -1,3 +1,9 @@
+2012-12-28 20:16  ralph.irving
+
+	* [r388] ChangeLog, tests/alsacap.c, tests/mmsdecode1.c,
+	  tests/mmsdecode2.cpp: Added mms/wma decoder example programs.
+	  Added alsa device capabilities info program.
+
 2012-12-28 20:14  ralph.irving
 
 	* [r387] ChangeLog, sources/portaudio-r1608.tar.gz,
