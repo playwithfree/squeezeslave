@@ -1,3 +1,10 @@
+2012-12-28 20:04  ralph.irving
+
+	* [r384] ChangeLog, lib/portaudio/pa_unix_oss/pa_unix.c: Disabled
+	  PaHost_BoostPriority call for portaudio v18 on Solaris as raising
+	  priority code for root doesn't work.
+	  Moved debug converting message to DBUGX.
+
 2012-12-24 12:32  ralph.irving
 
 	* [r383] ChangeLog, contrib/makefile.osx-lion-i64-display,
