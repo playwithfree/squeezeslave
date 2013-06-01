@@ -1,3 +1,72 @@
+2013-06-01 11:07  ralph.irving
+
+	* [r402] TODO: New somafm test URL.
+
+2013-06-01 11:00  ralph.irving
+
+	* [r401] src/squeezeslave/squeezeslave.c,
+	  src/squeezeslave/squeezeslave.h: Changed default
+	  paFramesPerBuffer to 4096 to prevent portaudio v18.1 write
+	  interrupted lockup on linux sun ray oss audio. Higher values
+	  cause utadem driver to throw an out of memory error.
+	  Increased revision to 401.
+
+2013-06-01 10:54  ralph.irving
+
+	* [r400] lib/portaudio/pa_unix_oss/pa_unix.c,
+	  src/squeezeslave/squeezeslave.c: Added BytesPerOutputBuffer debug
+	  output to portaudio v18.1
+	  Increased revision to 400.
+
+2013-06-01 10:52  ralph.irving
+
+	* [r399] lib/portaudio/pa_unix_oss/pa_unix.c,
+	  src/squeezeslave/squeezeslave.c: Set audio thread to RT scheduler
+	  if user has the required rights for solaris portaudio v18.1
+	  library.
+	  Increased revision to 399.
+
+2013-06-01 10:50  ralph.irving
+
+	* [r398] lib/portaudio/pa_unix_oss/pa_unix.c,
+	  src/squeezeslave/squeezeslave.c: Solaris doesn't use the watchdog
+	  thread, so no need to track cpu usage in portaudio v18.
+	  Increased revision to 398.
+
+2013-06-01 10:47  ralph.irving
+
+	* [r397] lib/portaudio/pa_unix_oss/pa_unix.c,
+	  lib/portaudio/pa_unix_oss/pa_unix.h,
+	  src/squeezeslave/squeezeslave.c: Moved portaudio v18 printing of
+	  PA_MIN_LATENCY_MSEC to debug.
+	  Increased revision to 397.
+
+2013-06-01 10:45  ralph.irving
+
+	* [r396] lib/portaudio/pa_unix_oss/pa_unix.h,
+	  src/squeezeslave/squeezeslave.c: Doubled portaudio v18
+	  MAX_CHARS_DEVNAME size as the default device name length for
+	  linux Sun Ray audio device is 32.
+	  Increased revision to 396.
+
+2013-03-08 12:11  ralph.irving
+
+	* [r395] src/squeezeslave/help.c, src/squeezeslave/interactive.c,
+	  src/squeezeslave/squeezeslave.c, src/squeezeslave/squeezeslave.h:
+	  Applied patch from Warren Merkel.
+	  Added -E command line option that allows lcdd to be running on a
+	  different host than localhost.
+	  Increased revision to 395.
+
+2013-01-19 19:41  ralph.irving
+
+	* [r393] ChangeLog, config/custom-convert.conf.wma,
+	  config/mplayer.sh, src/squeezeslave/squeezeslave.c: Capture
+	  working wma custom-convert.conf and mplayer.sh script.
+	  Tested with mplayer-1.0.rc3 which doesn't run at 100% cpu when
+	  streaming wma unlike 1.0rc4 and 1.1.
+	  Increased revision to 393.
+
 2013-01-19 19:38  ralph.irving
 
 	* [r392] ChangeLog, makefile.linux26-display,
